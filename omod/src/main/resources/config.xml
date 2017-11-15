@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<module configVersion="1.2">
+	<id>${project.parent.artifactId}</id>
+	<name>${project.parent.name}</name>
+	<version>${project.parent.version}</version>
+	<package>${MODULE_PACKAGE}</package>
+	<author>Bahmni</author>
+	<description>
+			${project.parent.description}
+	</description>
+
+	<activator>${MODULE_PACKAGE}.BasicModuleActivator</activator>
+	
+	<require_version>${openmrs.platform.version}</require_version>
+
+	<mappingFiles>
+	</mappingFiles>
+
+
+	<messages>
+		<lang>en</lang>
+		<file>messages.properties</file>
+	</messages>
+	<messages>
+		<lang>fr</lang>
+		<file>messages_fr.properties</file>
+	</messages>
+	<messages>
+		<lang>es</lang>
+		<file>messages_es.properties</file>
+	</messages>
+</module>
+
