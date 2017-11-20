@@ -30,5 +30,10 @@
 		<lang>es</lang>
 		<file>messages_es.properties</file>
 	</messages>
+
+	<advice>
+		<point>org.openmrs.api.PatientService</point>
+		<class>org.bahmni.module.bahmnipsi.identifier.BeforePatientSave</class>
+	</advice>
 </module>
 
