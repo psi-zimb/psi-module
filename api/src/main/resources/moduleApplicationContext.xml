@@ -21,5 +21,36 @@
   		    http://www.springframework.org/schema/util/spring-util-3.0.xsd">
     <bean class="org.springframework.web.servlet.mvc.annotation.DefaultAnnotationHandlerMapping"/>
 
-    <context:component-scan base-package="org.bahmni.module" />
+    <context:component-scan base-package="org.bahmni.module.bahmnipsi" />
+
+    <bean id="patientIdentifierService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+        <property name="transactionManager">
+            <ref bean="transactionManager"/>
+        </property>
+        <property name="target">
+            <bean class="org.bahmni.module.bahmnipsi.api.PatientIdentifierServiceImpl">
+                <property name="patientIdentifierDAO">
+                    <bean class="org.bahmni.module.bahmnipsi.api.PatientIdentifierDAO">
+                        <property name="sessionFactory">
+                            <ref bean="sessionFactory"/>
+                        </property>
+                    </bean>
+                </property>
+            </bean>
+        </property>
+        <property name="preInterceptors">
+            <ref bean="serviceInterceptors"/>
+        </property>
+        <property name="transactionAttributeSource">
+            <ref bean="transactionAttributeSource"/>
+        </property>
+    </bean>
+    <bean parent="serviceContext">
+        <property name="moduleService">
+            <list merge="true">
+                <value>org.bahmni.module.bahmnipsi.api.PatientIdentifierService</value>
+                <ref local="patientIdentifierService"/>
+            </list>
+        </property>
+    </bean>
 </beans>

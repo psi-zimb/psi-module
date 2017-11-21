@@ -1,5 +1,6 @@
 package org.bahmni.module.bahmnipsi.identifier;
 
+import org.bahmni.module.bahmnipsi.api.PatientIdentifierService;
 import org.openmrs.Concept;
 import org.openmrs.Patient;
 import org.openmrs.PatientIdentifier;
@@ -11,13 +12,19 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-class PatientUICIdentifier {
+public class PatientUICIdentifier {
+
+    PatientIdentifierService patientIdentifierService;
 
     private String identifierType = "UIC";
     private String mothersName = "Mother's name";
     private String district = "District of Birth";
 
-    void updateUICIdentifier(Patient patient) {
+    public void setPatientIdentifierService(PatientIdentifierService patientIdentifierService) {
+        this.patientIdentifierService = patientIdentifierService;
+    }
+
+    public void updateUICIdentifier(Patient patient) {
         String patientSurname = patient.getMiddleName();
         String nameOfMother = (patient.getAttribute(mothersName).getValue().split(" "))[0];
         PersonAttribute districtAttribute = patient.getAttribute(district);
@@ -32,10 +39,12 @@ class PatientUICIdentifier {
         stringsToFormat.add(nameOfMother);
         stringsToFormat.add(patientSurname);
         stringsToFormat.add(districtName);
-        String id = getAsOneString(stringsToFormat) + formattedDate + gender+"0";
+        String id = getAsOneString(stringsToFormat) + formattedDate + gender;
+
+        int count = Context.getService(PatientIdentifierService.class).getCountOfPatients(id);
 
         PatientIdentifier identifier = patient.getPatientIdentifier(identifierType);
-        identifier.setIdentifier(id);
+        identifier.setIdentifier(id+count);
     }
 
     private String getAsOneString(List<String> strings) {
