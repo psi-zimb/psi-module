@@ -14,7 +14,7 @@ import java.util.List;
 
 public class PatientUICIdentifier {
 
-    PatientIdentifierService patientIdentifierService;
+    private PatientIdentifierService patientIdentifierService;
 
     private String identifierType = "UIC";
     private String mothersName = "Mother's name";
@@ -31,23 +31,23 @@ public class PatientUICIdentifier {
         Concept concept = Context.getConceptService().getConcept(districtAttribute.getValue());
         String districtName = concept.getName().getName();
         String gender = patient.getGender();
-
         Date birthDate = patient.getBirthdate();
-        String formattedDate = new SimpleDateFormat("ddMMyy").format(birthDate);
+        String formattedBirthDate = new SimpleDateFormat("ddMMyy").format(birthDate);
 
         List<String> stringsToFormat = new ArrayList<>();
         stringsToFormat.add(nameOfMother);
         stringsToFormat.add(patientSurname);
         stringsToFormat.add(districtName);
-        String id = getAsOneString(stringsToFormat) + formattedDate + gender;
 
+        String id = getStringFromLastTwoLettersOfEachElement(stringsToFormat) + formattedBirthDate + gender;
         int count = Context.getService(PatientIdentifierService.class).getCountOfPatients(id);
+        String identifier = id + count;
 
-        PatientIdentifier identifier = patient.getPatientIdentifier(identifierType);
-        identifier.setIdentifier(id+count);
+        PatientIdentifier patientIdentifier = patient.getPatientIdentifier(identifierType);
+        patientIdentifier.setIdentifier(identifier);
     }
 
-    private String getAsOneString(List<String> strings) {
+    private String getStringFromLastTwoLettersOfEachElement(List<String> strings) {
         String str = "";
 
         for(String name:strings) {

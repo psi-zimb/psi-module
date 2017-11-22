@@ -1,5 +1,6 @@
 package org.bahmni.module.bahmnipsi.identifier;
 
+import org.bahmni.module.bahmnipsi.api.PatientIdentifierService;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
@@ -10,6 +11,7 @@ import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashSet;
 
@@ -28,17 +30,32 @@ public class PatientUICIdentifierTest {
     @Mock
     private ConceptName conceptName;
 
+    @Mock
+    private PatientIdentifierService patientIdentifierService;
+
+    @Mock
+    private SimpleDateFormat simpleDateFormat;
+
     @Test
-    public void shouldReturnGeneratedUICIdentifier() {
+    public void shouldReturnGeneratedUICIdentifier() throws Exception{
+        String dateFormat = "ddMMyy";
+        String formattedDate = "130117";
+        String withoutSuffix = "NEOERE130170M";
+        int count = 0;
+
         PatientUICIdentifier patientUICIdentifier = new PatientUICIdentifier();
         Patient patient = setUpPatientData();
 
         PowerMockito.mockStatic(Context.class);
+        PowerMockito.whenNew(SimpleDateFormat.class).withArguments(dateFormat).thenReturn(simpleDateFormat);
 
         when(Context.getConceptService()).thenReturn(conceptService);
         when(conceptService.getConcept("1001")).thenReturn(concept);
         when(concept.getName()).thenReturn(conceptName);
         when(conceptName.getName()).thenReturn("Harare");
+        when(simpleDateFormat.format(patient.getBirthdate())).thenReturn(formattedDate);
+        when(Context.getService(PatientIdentifierService.class)).thenReturn(patientIdentifierService);
+        when(patientIdentifierService.getCountOfPatients(withoutSuffix)).thenReturn(count);
 
         patientUICIdentifier.updateUICIdentifier(patient);
 

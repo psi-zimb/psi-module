@@ -8,7 +8,7 @@ import java.util.List;
 
 public class PatientIdentifierDAO {
 
-    SessionFactory sessionFactory;
+    private SessionFactory sessionFactory;
 
     public void setSessionFactory(SessionFactory sessionFactory) {
         this.sessionFactory = sessionFactory;
@@ -17,8 +17,8 @@ public class PatientIdentifierDAO {
     public int getCountOfPatients(String id) {
         String regex = id+"%";
         String sql = "select identifier from PatientIdentifier where identifier like :identifierRegex";
-        Session session = sessionFactory.getCurrentSession();
 
+        Session session = sessionFactory.getCurrentSession();
         List<PatientIdentifier> patientIdentifiers =  session.createQuery(sql).setParameter("identifierRegex", regex).list();
         return patientIdentifiers.size();
     }
