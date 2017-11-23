@@ -8,7 +8,7 @@ import org.openmrs.PersonAttribute;
 import org.openmrs.api.context.Context;
 
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -24,9 +24,17 @@ public class PatientUICIdentifier {
         this.patientIdentifierService = patientIdentifierService;
     }
 
-    public void updateUICIdentifier(Patient patient) {
-        String patientSurname = patient.getMiddleName();
-        String nameOfMother = (patient.getAttribute(mothersName).getValue().split(" "))[0];
+    public void updateUICIdentifier(Patient patient){
+        List<String> requiredFields = getRequiredFields(patient);
+        String identifier = getIdentifier(requiredFields);
+
+        PatientIdentifier patientIdentifier = patient.getPatientIdentifier(identifierType);
+        patientIdentifier.setIdentifier(identifier);
+    }
+
+    private List<String> getRequiredFields(Patient patient){
+        String patientSurname = patient.getFamilyName();
+        String nameOfMother = ((patient.getAttribute(mothersName).getValue().split(" "))[0]);
         PersonAttribute districtAttribute = patient.getAttribute(district);
         Concept concept = Context.getConceptService().getConcept(districtAttribute.getValue());
         String districtName = concept.getName().getName();
@@ -34,17 +42,28 @@ public class PatientUICIdentifier {
         Date birthDate = patient.getBirthdate();
         String formattedBirthDate = new SimpleDateFormat("ddMMyy").format(birthDate);
 
-        List<String> stringsToFormat = new ArrayList<>();
-        stringsToFormat.add(nameOfMother);
-        stringsToFormat.add(patientSurname);
-        stringsToFormat.add(districtName);
+        if(patientSurname !=null && nameOfMother != null && districtName != null && birthDate != null && gender != null) {
+            nameOfMother = nameOfMother.trim();
+            patientSurname = patientSurname.trim();
+            districtName = districtName.trim();
 
-        String id = getStringFromLastTwoLettersOfEachElement(stringsToFormat) + formattedBirthDate + gender;
+            if (nameOfMother.length() > 1 && patientSurname.length() > 1 && districtName.length() > 1) {
+                List<String> requiredFields = Arrays.asList(nameOfMother, patientSurname, districtName, formattedBirthDate, gender);
+                return requiredFields;
+            }
+            throw new RuntimeException("Patient family name, Mothers first name fields should have two characters at least");
+        }
+        throw new RuntimeException("Required fields Patient family name and Mothers first name should not be null");
+    }
+
+    private String getIdentifier(List<String> fields) {
+        List<String> stringsToFormat = Arrays.asList(fields.get(0), fields.get(1), fields.get(2));
+        String birthDate = fields.get(3);
+        String gender = fields.get(4);
+
+        String id = getStringFromLastTwoLettersOfEachElement(stringsToFormat) + birthDate + gender;
         int count = Context.getService(PatientIdentifierService.class).getCountOfPatients(id);
-        String identifier = id + count;
-
-        PatientIdentifier patientIdentifier = patient.getPatientIdentifier(identifierType);
-        patientIdentifier.setIdentifier(identifier);
+        return id + count;
     }
 
     private String getStringFromLastTwoLettersOfEachElement(List<String> strings) {
@@ -54,13 +73,8 @@ public class PatientUICIdentifier {
             int nameLength = name.length();
             String lastTwoLetters = name.substring(nameLength - 2, nameLength);
             String lettersInCap = lastTwoLetters.toUpperCase();
-            if (lettersInCap.charAt(0) < lettersInCap.charAt(1)) {
-                str = str.concat("" + lettersInCap.charAt(1) + lettersInCap.charAt(0));
-            } else {
-                str = str.concat(lettersInCap);
-            }
+            str = str.concat(lettersInCap);
         }
-
         return str;
     }
 }

@@ -13,7 +13,7 @@ public class BeforePatientSave implements MethodBeforeAdvice {
     public void before(Method method, Object[] objects, Object o) {
         if (method.getName().equalsIgnoreCase(methodToIntercept)) {
             Patient patient = (Patient) objects[0];
-            if (patient.getPatientId() == null) {
+            if (patient != null && patient.getPatientId() == null) {
                 PatientUICIdentifier patientUICIdentifier = new PatientUICIdentifier();
                 patientUICIdentifier.updateUICIdentifier(patient);
             }
