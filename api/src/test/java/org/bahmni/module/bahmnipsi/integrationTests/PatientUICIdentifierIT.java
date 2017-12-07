@@ -9,7 +9,7 @@ import org.openmrs.web.test.BaseModuleWebContextSensitiveTest;
 import static org.junit.Assert.assertEquals;
 
 @org.springframework.test.context.ContextConfiguration(locations = {"classpath:TestingApplicationContext.xml"}, inheritLocations = true)
-public class PatientIdentifierIT extends BaseModuleWebContextSensitiveTest {
+public class PatientUICIdentifierIT extends BaseModuleWebContextSensitiveTest {
     @Test
     public void shouldUpdateIdentifier() throws Exception{
         executeDataSet("PatientIdentifier.xml");

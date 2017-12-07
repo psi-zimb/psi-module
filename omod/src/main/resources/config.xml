@@ -30,6 +30,9 @@
 		<lang>es</lang>
 		<file>messages_es.properties</file>
 	</messages>
+	<require_modules>
+		<require_module version="0.89-SNAPSHOT">org.bahmni.module.bahmnicore</require_module>
+	</require_modules>
 
 	<advice>
 		<point>org.openmrs.api.PatientService</point>
