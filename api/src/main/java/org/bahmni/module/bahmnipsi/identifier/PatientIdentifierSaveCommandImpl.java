@@ -37,13 +37,13 @@ public class PatientIdentifierSaveCommandImpl implements EncounterDataPreSaveCom
                 try {
                     patientOiPrepIdentifier.updateOiPrepIdentifier(patientUuid, "A", requiredObs);
                 } catch (Exception e) {
-                    throw new RuntimeException(e);
+                    throw new RuntimeException(e.getMessage());
                 }
             } else if (requiredObs.equalsIgnoreCase(prepInitial)) {
                 try {
                     patientOiPrepIdentifier.updateOiPrepIdentifier(patientUuid, "P", requiredObs);
                 } catch (Exception e) {
-                    throw new RuntimeException(e);
+                    throw new RuntimeException(e.getMessage());
                 }
             }
         }
