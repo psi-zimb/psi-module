@@ -41,14 +41,6 @@ public class PatientTestData {
         return patient;
     }
 
-    public static Patient setOiPrepIdentifierToPatient() {
-        Patient patient = PatientTestData.setUpPatientData();
-        HashSet<PatientIdentifier> patientIdentifiers = getPatientIdentifiers("100005");
-        patient.setIdentifiers(patientIdentifiers);
-
-        return patient;
-    }
-
     public static Patient setOiPrepIdentifierToPatient(String identifier) {
         Patient patient = PatientTestData.setUpPatientData();
         HashSet<PatientIdentifier> patientIdentifiers = getPatientIdentifiers(identifier);
@@ -66,7 +58,6 @@ public class PatientTestData {
         patientIdentifiers.add(patientIdentifier);
         return patientIdentifiers;
     }
-
 
     public static BahmniEncounterTransaction setUpEncounterTransactionDataWith(String visitType, String conceptName, String patientUuid) {
         Collection<BahmniObservation> observations = createBahmniObservationsWith(visitType, conceptName);

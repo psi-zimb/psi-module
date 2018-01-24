@@ -46,7 +46,7 @@ public class PatientIdentifierSaveCommandImplTest {
 
     @Before
     public void setUp() {
-        patient = PatientTestData.setOiPrepIdentifierToPatient("Not Assigned");
+        patient = PatientTestData.setUpPatientData();
         mockStatic(Context.class);
         PowerMockito.when(Context.getPatientService()).thenReturn(patientService);
         PowerMockito.when(patientService.getPatientByUuid(patientUuid)).thenReturn(patient);
@@ -55,21 +55,21 @@ public class PatientIdentifierSaveCommandImplTest {
     @Test
     public void shouldCallUpdateOiPrepIdentifierWithAffixAWhenServiceIsInitialArt() throws Exception {
         patientIdentifierSaveCommandImpl.setPatientOiPrepIdentifier(patientOiPrepIdentifier);
-        doNothing().when(patientOiPrepIdentifier).updateOiPrepIdentifier(patientUuid, "A", initialArtService);
+        doNothing().when(patientOiPrepIdentifier).updateOiPrepIdentifier(patientUuid, "A");
         BahmniEncounterTransaction bahmniEncounterTransaction = PatientTestData.setUpEncounterTransactionDataWith(initialArtService,conceptName, patientUuid);
         patientIdentifierSaveCommandImpl.update(bahmniEncounterTransaction);
 
-        verify(patientOiPrepIdentifier, times(1)).updateOiPrepIdentifier(patientUuid, "A", initialArtService);
+        verify(patientOiPrepIdentifier, times(1)).updateOiPrepIdentifier(patientUuid, "A");
     }
 
     @Test
     public void shouldCallUpdateOiPrepIdentifierWithAffixPWhenServiceIsPrepInitial() throws Exception {
         patientIdentifierSaveCommandImpl.setPatientOiPrepIdentifier(patientOiPrepIdentifier);
-        doNothing().when(patientOiPrepIdentifier).updateOiPrepIdentifier(patientUuid, "P", prepInitial);
+        doNothing().when(patientOiPrepIdentifier).updateOiPrepIdentifier(patientUuid, "P");
         BahmniEncounterTransaction bahmniEncounterTransaction = PatientTestData.setUpEncounterTransactionDataWith(prepInitial, conceptName, patientUuid);
         patientIdentifierSaveCommandImpl.update(bahmniEncounterTransaction);
 
-        verify(patientOiPrepIdentifier, times(1)).updateOiPrepIdentifier(patientUuid, "P", prepInitial);
+        verify(patientOiPrepIdentifier, times(1)).updateOiPrepIdentifier(patientUuid, "P");
     }
 
     @Test
@@ -77,11 +77,11 @@ public class PatientIdentifierSaveCommandImplTest {
         patientIdentifierSaveCommandImpl.setPatientOiPrepIdentifier(patientOiPrepIdentifier);
         exception.expect(RuntimeException.class);
 
-        doThrow(RuntimeException.class).when(patientOiPrepIdentifier).updateOiPrepIdentifier(patientUuid, "A", initialArtService);
+        doThrow(RuntimeException.class).when(patientOiPrepIdentifier).updateOiPrepIdentifier(patientUuid, "A");
         BahmniEncounterTransaction bahmniEncounterTransaction = PatientTestData.setUpEncounterTransactionDataWith(initialArtService, conceptName, patientUuid);
         patientIdentifierSaveCommandImpl.update(bahmniEncounterTransaction);
 
-        verify(patientOiPrepIdentifier, times(1)).updateOiPrepIdentifier(patientUuid, "A", initialArtService);
+        verify(patientOiPrepIdentifier, times(1)).updateOiPrepIdentifier(patientUuid, "A");
     }
 
     @Test
@@ -89,11 +89,11 @@ public class PatientIdentifierSaveCommandImplTest {
         patientIdentifierSaveCommandImpl.setPatientOiPrepIdentifier(patientOiPrepIdentifier);
         exception.expect(RuntimeException.class);
 
-        doThrow(RuntimeException.class).when(patientOiPrepIdentifier).updateOiPrepIdentifier(patientUuid, "P", prepInitial);
+        doThrow(RuntimeException.class).when(patientOiPrepIdentifier).updateOiPrepIdentifier(patientUuid, "P");
         BahmniEncounterTransaction bahmniEncounterTransaction = PatientTestData.setUpEncounterTransactionDataWith(prepInitial, conceptName, patientUuid);
         patientIdentifierSaveCommandImpl.update(bahmniEncounterTransaction);
 
-        verify(patientOiPrepIdentifier, times(1)).updateOiPrepIdentifier(patientUuid, "P", prepInitial);
+        verify(patientOiPrepIdentifier, times(1)).updateOiPrepIdentifier(patientUuid, "P");
     }
 
     @Test
@@ -137,8 +137,8 @@ public class PatientIdentifierSaveCommandImplTest {
 
         patientIdentifierSaveCommandImpl.update(bahmniEncounterTransaction);
 
-        verify(patientOiPrepIdentifier, times(0)).updateOiPrepIdentifier(patientUuid, "A", initialArtService);
-        verify(patientOiPrepIdentifier, times(0)).updateOiPrepIdentifier(patientUuid, "P", prepInitial);
+        verify(patientOiPrepIdentifier, times(0)).updateOiPrepIdentifier(patientUuid, "A");
+        verify(patientOiPrepIdentifier, times(0)).updateOiPrepIdentifier(patientUuid, "P");
     }
 
     @Test
@@ -147,8 +147,8 @@ public class PatientIdentifierSaveCommandImplTest {
 
         patientIdentifierSaveCommandImpl.update(bahmniEncounterTransaction);
 
-        verify(patientOiPrepIdentifier, times(0)).updateOiPrepIdentifier(patientUuid, "A", initialArtService);
-        verify(patientOiPrepIdentifier, times(0)).updateOiPrepIdentifier(patientUuid, "P", prepInitial);
+        verify(patientOiPrepIdentifier, times(0)).updateOiPrepIdentifier(patientUuid, "A");
+        verify(patientOiPrepIdentifier, times(0)).updateOiPrepIdentifier(patientUuid, "P");
 
     }
 }

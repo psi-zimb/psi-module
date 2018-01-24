@@ -1,13 +1,9 @@
 package org.bahmni.module.bahmnipsi.identifier;
 
 import org.apache.commons.lang3.StringUtils;
-import org.openmrs.Patient;
-import org.openmrs.PatientIdentifier;
-import org.openmrs.Person;
-import org.openmrs.PersonAddress;
+import org.bahmni.module.bahmnipsi.api.PatientIdentifierService;
+import org.openmrs.*;
 import org.openmrs.api.context.Context;
-import org.openmrs.module.idgen.webservices.services.IdentifierSourceServiceWrapper;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.time.Year;
@@ -16,38 +12,24 @@ import java.util.List;
 
 @Component
 public class PatientOiPrepIdentifier {
-    private String identifierSource = "Prep/Oi Identifier";
+
     private String identifierType = "PREP/OI Identifier";
-    private static final int oiPrepIdentifierLength = 5;
-    private static final String defaultIdentifier = "Not Assigned";
+    private static final int oiPrepIdentifierSuffixLength = 5;
     private final int affixIndex = 14;
-    private final String initialArt = "Initial ART service";
-    private final String prepInitial = "PrEP Initial";
+    private final int codesLength = 2;
 
-    @Autowired
-    private IdentifierSourceServiceWrapper identifierSourceServiceWrapper;
-
-    public void setIdentifierToDefaultValue(Patient patient) {
-        PatientIdentifier patientIdentifier = patient.getPatientIdentifier(identifierType);
-        patientIdentifier.setIdentifier(defaultIdentifier);
-    }
-
-    public void updateOiPrepIdentifier(String patientUuid, String affix, String requiredObs) throws Exception {
+    public void updateOiPrepIdentifier(String patientUuid, String affix) throws Exception {
         PatientIdentifier patientIdentifier = getPatientIdentifier(patientUuid);
-        String oiPrepIdentifier = patientIdentifier.getIdentifier();
 
-        if(oiPrepIdentifier.equals(defaultIdentifier)) {
+        if(patientIdentifier == null) {
             updateIdentifierByUsing(patientUuid, affix);
         }  else {
+            String oiPrepIdentifier = patientIdentifier.getIdentifier();
             char existedAffix = oiPrepIdentifier.charAt(affixIndex);
-            if (existedAffix == 'A') {
-                if (requiredObs.equalsIgnoreCase(prepInitial)) {
-                    throw new RuntimeException("Can not change visit type from Initial Art Service to Prep Initial");
-                }
-            } else {
-                if (requiredObs.equalsIgnoreCase(initialArt)) {
-                    changeAffixPToA(patientIdentifier, oiPrepIdentifier);
-                }
+            if (existedAffix == 'A' && affix.charAt(0) == 'P') {
+                throw new RuntimeException("Can not change visit type from Initial Art Service to Prep Initial");
+            } else if (existedAffix == 'P' && affix.charAt(0) == 'A') {
+                changeAffixPToA(patientIdentifier, oiPrepIdentifier);
             }
         }
     }
@@ -55,9 +37,11 @@ public class PatientOiPrepIdentifier {
     private void updateIdentifierByUsing(String patientUuid, String affix) throws Exception {
         List<String> requiredFields = getRequiredFields(patientUuid);
         int nextSeqValue = getNextSeqValue();
-        String seqValueWithFiveChars = String.format("%0"+oiPrepIdentifierLength+"d", nextSeqValue);
-        setIdentifier(patientUuid, requiredFields, affix, seqValueWithFiveChars);
-        increaseIdentifierNextSeqValueByOne(nextSeqValue);
+        String seqValueWithFiveChars = String.format("%0"+ oiPrepIdentifierSuffixLength +"d", nextSeqValue);
+        PatientIdentifier patientIdentifier = createIdentifier();
+        addIdentifier(patientUuid, patientIdentifier);
+        setIdentifier(patientIdentifier, requiredFields, affix, seqValueWithFiveChars);
+        incrementNextSeqValueByOne(nextSeqValue);
     }
 
     private List<String> getRequiredFields(String patientUuid) {
@@ -70,7 +54,11 @@ public class PatientOiPrepIdentifier {
         int year = Year.now().getValue();
 
         if(provinceCode != null && districtCode != null && facilityCode != null) {
-            return Arrays.asList(provinceCode, districtCode, facilityCode, year + "");
+            if(provinceCode.length() == codesLength && districtCode.length() == codesLength && facilityCode.length() == codesLength) {
+                return Arrays.asList(provinceCode, districtCode, facilityCode, year + "");
+            } else {
+                throw new RuntimeException("province, district and facility code lengths must be 2");
+            }
         } else {
             throw new RuntimeException("Could not able to get required fields to generate Prep/Oi identifier");
         }
@@ -81,13 +69,19 @@ public class PatientOiPrepIdentifier {
     }
 
     private int getNextSeqValue() throws Exception {
-        String nextSeqValue = identifierSourceServiceWrapper.getSequenceValue(identifierSource);
-        return Integer.parseInt(nextSeqValue);
+        try {
+            return Context.getService(PatientIdentifierService.class).getNextSeqValue();
+        } catch (Exception e) {
+            throw new RuntimeException("Could not able to get next Sequence Value");
+        }
     }
 
-    private void setIdentifier(String patientUuid, List<String> requiredFields, String affix, String nextSeqValue) {
-        PatientIdentifier patientIdentifier = getPatientIdentifier(patientUuid);
+    private void setIdentifier(PatientIdentifier patientIdentifier, List<String> requiredFields, String affix, String nextSeqValue) {
         patientIdentifier.setIdentifier(requiredFields.get(0)+"-"+requiredFields.get(1)+"-"+requiredFields.get(2)+"-"+requiredFields.get(3)+"-"+affix+"-"+nextSeqValue);
+    }
+
+    private void incrementNextSeqValueByOne(int currentSeqValue) {
+        Context.getService(PatientIdentifierService.class).incrementSeqValueByOne(currentSeqValue);
     }
 
     private PatientIdentifier getPatientIdentifier(String patientUuid) {
@@ -95,23 +89,22 @@ public class PatientOiPrepIdentifier {
         return patient.getPatientIdentifier(identifierType);
     }
 
+    private PatientIdentifier createIdentifier() {
+        int identifierTypeId = Context.getService(PatientIdentifierService.class).getIdentifierTypeId(this.identifierType);
+        PatientIdentifier patientIdentifier = new PatientIdentifier();
+        PatientIdentifierType identifierType = new PatientIdentifierType(identifierTypeId);
+        patientIdentifier.setIdentifierType(identifierType);
+        return patientIdentifier;
+    }
+
+    private void addIdentifier(String patientUuid, PatientIdentifier patientIdentifier) {
+        Patient patient = Context.getPatientService().getPatientByUuid(patientUuid);
+        patient.addIdentifier(patientIdentifier);
+    }
+
     private void changeAffixPToA(PatientIdentifier patientIdentifier, String oiPrepIdentifier) {
         StringBuffer newIdentifier = new StringBuffer(oiPrepIdentifier);
         newIdentifier.setCharAt(affixIndex, 'A');
         patientIdentifier.setIdentifier(newIdentifier.toString());
-    }
-
-    public void decreaseIdentifierNextValueByOne() throws Exception {
-        String sequenceValue = identifierSourceServiceWrapper.getSequenceValue(identifierSource);
-        long nextId = Long.parseLong(sequenceValue);
-        identifierSourceServiceWrapper.saveSequenceValue(nextId - 1, identifierSource);
-    }
-
-    private void increaseIdentifierNextSeqValueByOne(int nextValue) throws Exception {
-        identifierSourceServiceWrapper.saveSequenceValue(nextValue + 1, identifierSource);
-    }
-
-    public void setIdentifierSourceServiceWrapper(IdentifierSourceServiceWrapper identifierSourceServiceWrapper) {
-        this.identifierSourceServiceWrapper = identifierSourceServiceWrapper;
     }
 }

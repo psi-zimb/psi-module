@@ -12,4 +12,19 @@ public class PatientIdentifierServiceImpl implements PatientIdentifierService {
     public int getCountOfPatients(String identifier) {
         return patientIdentifierDAO.getCountOfPatients(identifier);
     }
+
+    @Override
+    public int getNextSeqValue() {
+        return patientIdentifierDAO.getNextSeqValue();
+    }
+
+    @Override
+    public int getIdentifierTypeId(String identifierType) {
+        return patientIdentifierDAO.getIdentifierTypeId(identifierType);
+    }
+
+    @Override
+    public void incrementSeqValueByOne(int seqValue) {
+        patientIdentifierDAO.incrementSeqValueByOne(seqValue);
+    }
 }
