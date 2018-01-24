@@ -15,6 +15,7 @@ import org.openmrs.module.emrapi.encounter.domain.EncounterTransaction;
 import org.openmrs.web.test.BaseModuleWebContextSensitiveTest;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.time.Year;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.LinkedHashMap;
@@ -31,33 +32,37 @@ public class PatientPrepOiIdentifierIT extends BaseModuleWebContextSensitiveTest
     private String initialArtService = "Initial ART service";
     private String prepInitial = "PrEP Initial";
     private String conceptName = "Reason for visit";
+    int year = Year.now().getValue();
 
     @Test
     public void shouldUpdatePrepOiIdentifierForPrepInitial() throws Exception {
-        executeDataSet("PatientIdentifier.xml");
+        executeDataSet("PatientPrepOiIdentifier.xml");
         String patientUuid = "61b38324-e2fd-4feb-95b7-9e9a2a4400df";
+        String expectedIdentifier = "02-0A-05-"+year+"-P-00010";
+
         BahmniEncounterTransaction bahmniEncounterTransaction = PatientTestData.setUpEncounterTransactionDataWith(prepInitial, conceptName, patientUuid);
 
         patientIdentifierSaveCommand.update(bahmniEncounterTransaction);
-        Patient patient = Context.getPatientService().getPatientByUuid(patientUuid);
 
-        String actualIdentifier = patient.getPatientIdentifier(identifierType).getIdentifier();
-        String expectedIdentifier = "02-0A-05-2017-P-00078";
+        Patient patient = Context.getPatientService().getPatientByUuid(patientUuid);
+        Integer identifierTypeId = Context.getPatientService().getPatientIdentifierTypeByName(identifierType).getId();
+        String actualIdentifier = patient.getPatientIdentifier(identifierTypeId).getIdentifier();
 
         Assert.assertEquals(expectedIdentifier, actualIdentifier);
     }
 
     @Test
     public void shouldUpdatePrepOiIdentifierForInitialArt() throws Exception {
-        executeDataSet("PatientIdentifier.xml");
+        executeDataSet("PatientPrepOiIdentifier.xml");
         String patientUuid = "61b38324-e2fd-4feb-95b7-9e9a2a4400df";
+        String expectedIdentifier = "02-0A-05-"+year+"-A-00010";
         BahmniEncounterTransaction bahmniEncounterTransaction = PatientTestData.setUpEncounterTransactionDataWith(initialArtService, conceptName, patientUuid);
 
         patientIdentifierSaveCommand.update(bahmniEncounterTransaction);
-        Patient patient = Context.getPatientService().getPatientByUuid(patientUuid);
 
-        String actualIdentifier = patient.getPatientIdentifier(identifierType).getIdentifier();
-        String expectedIdentifier = "02-0A-05-2017-A-00078";
+        Patient patient = Context.getPatientService().getPatientByUuid(patientUuid);
+        Integer identifierTypeId = Context.getPatientService().getPatientIdentifierTypeByName(identifierType).getId();
+        String actualIdentifier = patient.getPatientIdentifier(identifierTypeId).getIdentifier();
 
         Assert.assertEquals(expectedIdentifier, actualIdentifier);
     }
@@ -68,24 +73,24 @@ public class PatientPrepOiIdentifierIT extends BaseModuleWebContextSensitiveTest
         String patientUuid = "61b38324-e2fd-4feb-95b7-9e9a2a4400df";
         Patient patient = Context.getPatientService().getPatientByUuid(patientUuid);
         PatientIdentifier patientIdentifier = patient.getPatientIdentifier(identifierType);
-        patientIdentifier.setIdentifier("02-0A-05-2017-P-00078");
+        patientIdentifier.setIdentifier("02-0A-05-"+year+"-P-00078");
         BahmniEncounterTransaction bahmniEncounterTransaction = PatientTestData.setUpEncounterTransactionDataWith(initialArtService, conceptName, patientUuid);
 
         patientIdentifierSaveCommand.update(bahmniEncounterTransaction);
 
         String actualIdentifier = patient.getPatientIdentifier(identifierType).getIdentifier();
-        String expectedIdentifier = "02-0A-05-2017-A-00078";
+        String expectedIdentifier = "02-0A-05-"+year+"-A-00078";
 
         Assert.assertEquals(expectedIdentifier, actualIdentifier);
     }
 
     @Test
-    public void shouldNotChangeIdentifierFromAToP() throws Exception {
+    public void shouldNotAbleToChangeIdentifierFromAToP() throws Exception {
         executeDataSet("PatientIdentifier.xml");
         String patientUuid = "61b38324-e2fd-4feb-95b7-9e9a2a4400df";
         Patient patient = Context.getPatientService().getPatientByUuid(patientUuid);
         PatientIdentifier patientIdentifier = patient.getPatientIdentifier(identifierType);
-        patientIdentifier.setIdentifier("02-0A-05-2017-A-00078");
+        patientIdentifier.setIdentifier("02-0A-05-"+year+"-A-00078");
         BahmniEncounterTransaction bahmniEncounterTransaction = PatientTestData.setUpEncounterTransactionDataWith(prepInitial, conceptName, patientUuid);
 
         exception.expect(RuntimeException.class);

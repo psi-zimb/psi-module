@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+        "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+        "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+    <class name="org.bahmni.module.bahmnipsi.identifier.PrepOiCounter" table="prep_oi_counter">
+        <id name="id" type="int" column="id" unsaved-value="0">
+            <generator class="native"/>
+        </id>
+
+        <property name="nextSeqValue" type="int" column="next_seq_value" not-null="true" />
+    </class>
+</hibernate-mapping>
