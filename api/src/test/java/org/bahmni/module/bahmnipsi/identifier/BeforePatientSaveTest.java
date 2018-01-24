@@ -1,12 +1,13 @@
 package org.bahmni.module.bahmnipsi.identifier;
 
 import org.bahmni.module.bahmnipsi.PatientTestData;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.openmrs.Patient;
 import org.openmrs.api.context.Context;
-import org.openmrs.module.idgen.webservices.services.IdentifierSourceServiceWrapperImpl;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
@@ -27,12 +28,8 @@ public class BeforePatientSaveTest {
     @Mock
     private PatientUICIdentifier patientUICIdentifier;
 
-    @Mock
-    private PatientOiPrepIdentifier patientOiPrepIdentifier;
-
-    @Mock
-    private IdentifierSourceServiceWrapperImpl identifierSourceServiceWrapperImpl;
-
+    @Rule
+    public final ExpectedException exception = ExpectedException.none();
 
     @Test
     public void shouldNotCallUpdateUICIdentifierIfPatientIsNull() throws Exception {
@@ -44,12 +41,10 @@ public class BeforePatientSaveTest {
         beforePatientSave.before(method, input, output);
 
         verify(patientUICIdentifier, times(0)).updateUICIdentifier(anyObject());
-        verify(patientOiPrepIdentifier, times(0)).decreaseIdentifierNextValueByOne();
-        verify(patientOiPrepIdentifier, times(0)).setIdentifierToDefaultValue(anyObject());
     }
 
     @Test
-    public void shouldUpdateUICAndDecreasePrepIdByOne() throws Exception {
+    public void shouldCallUpdateUIC() throws Exception {
         String methodToIntercept = "savePatient";
         method = this.getClass().getMethod(methodToIntercept);
         patient = PatientTestData.setUpPatientData();
@@ -57,20 +52,12 @@ public class BeforePatientSaveTest {
         input= new Object[]{patient};
 
         whenNew(PatientUICIdentifier.class).withNoArguments().thenReturn(patientUICIdentifier);
-        whenNew(PatientOiPrepIdentifier.class).withNoArguments().thenReturn(patientOiPrepIdentifier);
-        whenNew(IdentifierSourceServiceWrapperImpl.class).withNoArguments().thenReturn(identifierSourceServiceWrapperImpl);
         doNothing().when(patientUICIdentifier).updateUICIdentifier(patient);
-        doNothing().when(patientOiPrepIdentifier).decreaseIdentifierNextValueByOne();
-        doNothing().when(patientOiPrepIdentifier).setIdentifierToDefaultValue(patient);
-        doNothing().when(patientOiPrepIdentifier).setIdentifierSourceServiceWrapper(identifierSourceServiceWrapperImpl);
 
         BeforePatientSave beforePatientSave = new BeforePatientSave();
         beforePatientSave.before(method, input, output);
 
         verify(patientUICIdentifier, times(1)).updateUICIdentifier(patient);
-        verify(patientOiPrepIdentifier, times(1)).decreaseIdentifierNextValueByOne();
-        verify(patientOiPrepIdentifier, times(1)).setIdentifierToDefaultValue(patient);
-        verify(patientOiPrepIdentifier, times(1)).setIdentifierSourceServiceWrapper(identifierSourceServiceWrapperImpl);
     }
 
     @Test
@@ -83,9 +70,25 @@ public class BeforePatientSaveTest {
         beforePatientSave.before(method, input, output);
 
         verify(patientUICIdentifier, times(0)).updateUICIdentifier(anyObject());
-        verify(patientOiPrepIdentifier, times(0)).decreaseIdentifierNextValueByOne();
-        verify(patientOiPrepIdentifier, times(0)).setIdentifierToDefaultValue(anyObject());
-        verify(patientOiPrepIdentifier, times(0)).setIdentifierSourceServiceWrapper(identifierSourceServiceWrapperImpl);
+    }
+
+    @Test
+    public void shouldThrowExceptionIfTheGivenIdentifierIsNotMatchingWithPattern() throws Exception {
+        String identifier = "00-OA-63-2017";
+        String methodToIntercept = "savePatient";
+        method = this.getClass().getMethod(methodToIntercept);
+        patient = PatientTestData.setOiPrepIdentifierToPatient(identifier);
+        output = new Object();
+        input= new Object[]{patient};
+
+        whenNew(PatientUICIdentifier.class).withNoArguments().thenReturn(patientUICIdentifier);
+        doNothing().when(patientUICIdentifier).updateUICIdentifier(patient);
+
+        exception.expectMessage("Given Prep/Oi Identifier is not matching with the Expected Pattern");
+        exception.expect(RuntimeException.class);
+
+        BeforePatientSave beforePatientSave = new BeforePatientSave();
+        beforePatientSave.before(method, input, output);
     }
 
     public void savePatient() {
