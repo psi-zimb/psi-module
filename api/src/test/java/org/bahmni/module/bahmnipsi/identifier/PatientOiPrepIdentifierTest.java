@@ -149,7 +149,6 @@ public class PatientOiPrepIdentifierTest {
         verify(personAddress, times(1)).getStateProvince();
         verify(personAddress, times(1)).getCityVillage();
         verify(personAddress, times(1)).getPostalCode();
-//        verify(yearObj, times(1)).getValue();
         verify(patientIdentifierService, times(1)).getNextSeqValue();
         verify(patientIdentifierService, times(1)).getIdentifierTypeId(identifierType);
         verify(patientIdentifier, times(1)).setIdentifierType(patientIdentifierType);

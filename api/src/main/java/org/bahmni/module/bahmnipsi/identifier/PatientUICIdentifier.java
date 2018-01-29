@@ -1,6 +1,5 @@
 package org.bahmni.module.bahmnipsi.identifier;
 
-import org.bahmni.module.bahmnipsi.api.PatientIdentifierService;
 import org.openmrs.Concept;
 import org.openmrs.Patient;
 import org.openmrs.PatientIdentifier;
@@ -14,15 +13,17 @@ import java.util.List;
 
 public class PatientUICIdentifier {
 
-    private PatientIdentifierService patientIdentifierService;
-
     private String identifierType = "UIC";
     private String mothersName = "Mother's name";
     private String district = "District of Birth";
-
-    public void setPatientIdentifierService(PatientIdentifierService patientIdentifierService) {
-        this.patientIdentifierService = patientIdentifierService;
-    }
+    private String areYouTwin = "Are you a twin?";
+    private String areYouFirstBorn = "If yes, are you the firstborn?";
+    private final int requiredFieldsMinLength = 2;
+    private String yes = "Yes";
+    private String no = "No";
+    private String twinOne = "T1";
+    private String twinTwo = "T2";
+    private final int requiredFieldsLengthWithTwins = 6;
 
     public void updateUICIdentifier(Patient patient){
         List<String> requiredFields = getRequiredFields(patient);
@@ -35,35 +36,50 @@ public class PatientUICIdentifier {
     private List<String> getRequiredFields(Patient patient){
         String patientSurname = patient.getFamilyName();
         String nameOfMother = ((patient.getAttribute(mothersName).getValue().split(" "))[0]);
-        PersonAttribute districtAttribute = patient.getAttribute(district);
-        Concept concept = Context.getConceptService().getConcept(districtAttribute.getValue());
-        String districtName = concept.getName().getName();
+        String districtName = getAttributeValue(district, patient);
         String gender = patient.getGender();
         Date birthDate = patient.getBirthdate();
         String formattedBirthDate = new SimpleDateFormat("ddMMyy").format(birthDate);
+        String twinValue = getAttributeValue(areYouTwin, patient);
+        String firstBornValue = getAttributeValue(areYouFirstBorn, patient);
 
         if(patientSurname !=null && nameOfMother != null && districtName != null && birthDate != null && gender != null) {
             nameOfMother = nameOfMother.trim();
             patientSurname = patientSurname.trim();
             districtName = districtName.trim();
 
-            if (nameOfMother.length() > 1 && patientSurname.length() > 1 && districtName.length() > 1) {
-                List<String> requiredFields = Arrays.asList(nameOfMother, patientSurname, districtName, formattedBirthDate, gender);
-                return requiredFields;
+            if (nameOfMother.length() >= requiredFieldsMinLength && patientSurname.length() >= requiredFieldsMinLength && districtName.length() >= requiredFieldsMinLength) {
+                if((twinValue == null && firstBornValue == null) || (no.equals(twinValue) && firstBornValue == null)) {
+                    return Arrays.asList(nameOfMother, patientSurname, districtName, formattedBirthDate, gender);
+                } else if(yes.equals(twinValue) && yes.equals(firstBornValue)) {
+                    return Arrays.asList(nameOfMother, patientSurname, districtName, formattedBirthDate, gender, twinOne);
+                } else if(yes.equals(twinValue) && no.equals(firstBornValue)) {
+                    return Arrays.asList(nameOfMother, patientSurname, districtName, formattedBirthDate, gender, twinTwo);
+                }
+
+                throw new RuntimeException("Please Answer both "+areYouTwin+" and "+areYouFirstBorn+" or don't answer both.");
             }
             throw new RuntimeException("Patient family name, Mothers first name fields should have two characters at least");
         }
         throw new RuntimeException("Required fields Patient family name and Mothers first name should not be null");
     }
 
+    private String getAttributeValue(String attribute, Patient patient) {
+        PersonAttribute personAttribute = patient.getAttribute(attribute);
+        if(personAttribute != null) {
+            Concept concept = Context.getConceptService().getConcept(personAttribute.getValue());
+            return concept.getName().getName();
+        }
+        return null;
+    }
+
     private String getIdentifier(List<String> fields) {
         List<String> stringsToFormat = Arrays.asList(fields.get(0), fields.get(1), fields.get(2));
         String birthDate = fields.get(3);
         String gender = fields.get(4);
+        String twin = fields.size() == requiredFieldsLengthWithTwins ? fields.get(5) : "";
 
-        String id = getStringFromLastTwoLettersOfEachElement(stringsToFormat) + birthDate + gender;
-        int count = Context.getService(PatientIdentifierService.class).getCountOfPatients(id);
-        return id + count;
+        return getStringFromLastTwoLettersOfEachElement(stringsToFormat) + birthDate + gender + twin;
     }
 
     private String getStringFromLastTwoLettersOfEachElement(List<String> strings) {

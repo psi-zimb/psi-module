@@ -44,44 +44,6 @@ public class PatientIdentifierDAOTest {
     }
 
     @Test
-    public void shouldReturnZeroWhenThereAreNoPatientsWithTheGivenIdentifier() {
-        String sql = "select identifier from PatientIdentifier where identifier like :identifierRegex";
-
-        when(sessionFactory.getCurrentSession()).thenReturn(session);
-        when(session.createQuery(sql)).thenReturn(query);
-        when(query.setParameter("identifierRegex", regex)).thenReturn(query);
-
-        int count = patientIdentifierDAO.getCountOfPatients(identifier);
-
-        verify(sessionFactory, times(1)).getCurrentSession();
-        verify(session, times(1)).createQuery(sql);
-        verify(query, times(1)).setParameter("identifierRegex", regex);
-        verify(query, times(1)).list();
-        Assert.assertEquals(0, count);
-    }
-
-    @Test
-    public void shouldReturnPatientsCountWhenThereArePatients() {
-        String sql = "select identifier from PatientIdentifier where identifier like :identifierRegex";
-        PatientIdentifier patientIdentifier1 = new PatientIdentifier();
-        PatientIdentifier patientIdentifier2 = new PatientIdentifier();
-        List<PatientIdentifier> patientIdentifiers = Arrays.asList(patientIdentifier1, patientIdentifier2);
-
-        when(sessionFactory.getCurrentSession()).thenReturn(session);
-        when(session.createQuery(sql)).thenReturn(query);
-        when(query.setParameter("identifierRegex", regex)).thenReturn(query);
-        when(query.list()).thenReturn(patientIdentifiers);
-
-        int count = patientIdentifierDAO.getCountOfPatients(identifier);
-
-        verify(sessionFactory, times(1)).getCurrentSession();
-        verify(session, times(1)).createQuery(sql);
-        verify(query, times(1)).setParameter("identifierRegex", regex);
-        verify(query, times(1)).list();
-        Assert.assertEquals(2, count);
-    }
-
-    @Test
     public void shouldGetNextSeqValue() {
         String sql = "select next_seq_value from prep_oi_counter";
         Integer nextVal = new Integer(3);

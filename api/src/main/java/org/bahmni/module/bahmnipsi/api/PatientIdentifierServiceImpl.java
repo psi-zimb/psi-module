@@ -9,11 +9,6 @@ public class PatientIdentifierServiceImpl implements PatientIdentifierService {
     }
 
     @Override
-    public int getCountOfPatients(String identifier) {
-        return patientIdentifierDAO.getCountOfPatients(identifier);
-    }
-
-    @Override
     public int getNextSeqValue() {
         return patientIdentifierDAO.getNextSeqValue();
     }

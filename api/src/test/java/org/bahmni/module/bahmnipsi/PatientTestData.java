@@ -24,11 +24,9 @@ public class PatientTestData {
         patientIdentifiers.add(patientIdentifier);
 
         PersonAttributeType personAttributeTypeMother = new PersonAttributeType();
-        PersonAttributeType personAttributeTypeDistrict = new PersonAttributeType();
         personAttributeTypeMother.setName("Mother's name");
-        personAttributeTypeDistrict.setName("District of Birth");
         PersonAttribute personMotherNameAttribute = new PersonAttribute(personAttributeTypeMother, "jaen Doe");
-        PersonAttribute personDistrictAttribute = new PersonAttribute(personAttributeTypeDistrict, "510");
+        PersonAttribute personDistrictAttribute = getPersonAttribute("District of Birth", "510");
         HashSet<PersonAttribute> personAttributes = new HashSet<PersonAttribute>();
         personAttributes.add(personMotherNameAttribute);
         personAttributes.add(personDistrictAttribute);
@@ -39,6 +37,12 @@ public class PatientTestData {
         patient.setIdentifiers(patientIdentifiers);
         patient.setAttributes(personAttributes);
         return patient;
+    }
+
+    public static PersonAttribute getPersonAttribute(String attributeType, String value) {
+        PersonAttributeType personAttributeTypeDistrict = new PersonAttributeType();
+        personAttributeTypeDistrict.setName(attributeType);
+        return new PersonAttribute(personAttributeTypeDistrict, value);
     }
 
     public static Patient setOiPrepIdentifierToPatient(String identifier) {

@@ -23,19 +23,6 @@ public class PatientIdentifierServiceImplTest {
     }
 
     @Test
-    public void shouldCallGetCountOfPatientsOfPatientIdentifierDAO() {
-        int expectedOutput = 1;
-        String identifier = "test id";
-
-        when(patientIdentifierDAO.getCountOfPatients(identifier)).thenReturn(expectedOutput);
-
-        int actualOutput = impl.getCountOfPatients(identifier);
-
-        verify(patientIdentifierDAO, times(1)).getCountOfPatients(identifier);
-        Assert.assertEquals(expectedOutput, actualOutput);
-    }
-
-    @Test
     public void shouldGetNextValue() {
         int expectedOutput = 2;
 
