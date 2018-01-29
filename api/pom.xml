@@ -3,13 +3,13 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>org.bahmni.module</groupId>
-        <artifactId>uic-prep-oi-gen</artifactId>
+        <artifactId>bahmnipsi</artifactId>
         <version>0.1-SNAPSHOT</version>
     </parent>
 
-    <artifactId>uic-prep-oi-gen-api</artifactId>
+    <artifactId>bahmnipsi-api</artifactId>
     <packaging>jar</packaging>
-    <name>uic-prep-oi-gen Module API</name>
+    <name>bahmnipsi Module API</name>
     <description>API project for Basic Module</description>
 
     <dependencies>

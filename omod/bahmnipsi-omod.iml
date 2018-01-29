@@ -12,7 +12,7 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="library" name="Maven: org.bahmni.module:bahmnipsi-api:0.1-SNAPSHOT" level="project" />
+    <orderEntry type="module" module-name="bahmnipsi-api" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: org.openmrs.module:idgen-webservices-omod:1.1-SNAPSHOT" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: org.openmrs.module:idgen-webservices-api:1.1-SNAPSHOT" level="project" />
   </component>
