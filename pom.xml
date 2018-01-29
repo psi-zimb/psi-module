@@ -3,10 +3,10 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>org.bahmni.module</groupId>
-	<artifactId>bahmnipsi</artifactId>
+	<artifactId>uic-prep-oi-gen</artifactId>
 	<version>0.1-SNAPSHOT</version>
 	<packaging>pom</packaging>
-	<name>bahmnipsi Module</name>
+	<name>uic-prep-oi-gen Module</name>
 	<description>Example OpenMRS Module that may be used as a basis for creating a new module.</description>
 
 	<developers>
