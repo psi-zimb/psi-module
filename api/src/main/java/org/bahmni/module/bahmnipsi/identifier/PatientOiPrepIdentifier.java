@@ -57,10 +57,10 @@ public class PatientOiPrepIdentifier {
             if(provinceCode.length() == codesLength && districtCode.length() == codesLength && facilityCode.length() == codesLength) {
                 return Arrays.asList(provinceCode, districtCode, facilityCode, year + "");
             } else {
-                throw new RuntimeException("province, district and facility code lengths must be 2");
+                throw new RuntimeException("Province, District and Facility code lengths must be 2");
             }
         } else {
-            throw new RuntimeException("Could not able to get required fields to generate Prep/Oi identifier");
+            throw new RuntimeException("Province, District and Facility should not be empty on the Registration first page to generate Prep/Oi Identifier.");
         }
     }
 
@@ -72,7 +72,7 @@ public class PatientOiPrepIdentifier {
         try {
             return Context.getService(PatientIdentifierService.class).getNextSeqValue();
         } catch (Exception e) {
-            throw new RuntimeException("Could not able to get next Sequence Value");
+            throw new RuntimeException("Could not able to get next Sequence Value of the Prep/Oi Identifier");
         }
     }
 

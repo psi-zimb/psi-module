@@ -35,7 +35,7 @@ public class PatientUICIdentifier {
 
     private List<String> getRequiredFields(Patient patient){
         String patientSurname = patient.getFamilyName();
-        String nameOfMother = ((patient.getAttribute(mothersName).getValue().split(" "))[0]);
+        String nameOfMother = patient.getAttribute(mothersName) != null ? ((patient.getAttribute(mothersName).getValue().split(" "))[0]) : null;
         String districtName = getAttributeValue(district, patient);
         String gender = patient.getGender();
         Date birthDate = patient.getBirthdate();
@@ -57,11 +57,11 @@ public class PatientUICIdentifier {
                     return Arrays.asList(nameOfMother, patientSurname, districtName, formattedBirthDate, gender, twinTwo);
                 }
 
-                throw new RuntimeException("Please Answer both "+areYouTwin+" and "+areYouFirstBorn+" or don't answer both.");
+                throw new RuntimeException("Please Answer both "+areYouTwin+" and "+areYouFirstBorn+" or neither.");
             }
-            throw new RuntimeException("Patient family name, Mothers first name fields should have two characters at least");
+            throw new RuntimeException("Patient Last Name, Mothers First Name fields should have two characters at least");
         }
-        throw new RuntimeException("Required fields Patient family name and Mothers first name should not be null");
+        throw new RuntimeException("Required fields like Patient Last Name, Age, District Name, Gender, Mothers First Name should not be empty");
     }
 
     private String getAttributeValue(String attribute, Patient patient) {

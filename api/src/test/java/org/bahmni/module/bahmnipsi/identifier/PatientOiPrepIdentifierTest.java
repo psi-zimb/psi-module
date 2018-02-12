@@ -75,7 +75,7 @@ public class PatientOiPrepIdentifierTest {
         when(StringUtils.substringBetween(null, "[", "]")).thenReturn(null);
 
         exception.expect(RuntimeException.class);
-        exception.expectMessage("Could not able to get required fields to generate Prep/Oi identifier");
+        exception.expectMessage("Province, District and Facility should not be empty on the Registration first page to generate Prep/Oi Identifier.");
 
         patientOiPrepIdentifier.updateOiPrepIdentifier(patientUuid, affix);
     }
@@ -91,7 +91,7 @@ public class PatientOiPrepIdentifierTest {
         when(StringUtils.substringBetween(province, "[", "]")).thenReturn("");
 
         exception.expect(RuntimeException.class);
-        exception.expectMessage("province, district and facility code lengths must be 2");
+        exception.expectMessage("Province, District and Facility code lengths must be 2");
 
         patientOiPrepIdentifier.updateOiPrepIdentifier(patientUuid, affix);
     }
@@ -108,7 +108,7 @@ public class PatientOiPrepIdentifierTest {
         doThrow(RuntimeException.class).when(patientIdentifierService).getNextSeqValue();
 
         exception.expect(RuntimeException.class);
-        exception.expectMessage("Could not able to get next Sequence Value");
+        exception.expectMessage("Could not able to get next Sequence Value of the Prep/Oi Identifier");
 
         patientOiPrepIdentifier.updateOiPrepIdentifier(patientUuid, affix);
     }

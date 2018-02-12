@@ -61,7 +61,7 @@ public class PatientUICIdentifierIT extends BaseModuleWebContextSensitiveTest {
         patient.addAttribute(PatientTestData.getPersonAttribute(areYouTwin, "2146"));
 
         exception.expect(RuntimeException.class);
-        exception.expectMessage("Please Answer both "+areYouTwin+" and "+areYouFirstBorn+" or don't answer both.");
+        exception.expectMessage("Please Answer both "+areYouTwin+" and "+areYouFirstBorn+" or neither.");
 
         patientUICIdentifier.updateUICIdentifier(patient);
     }
@@ -74,7 +74,7 @@ public class PatientUICIdentifierIT extends BaseModuleWebContextSensitiveTest {
         patient.addAttribute(PatientTestData.getPersonAttribute(areYouFirstBorn, "2146"));
 
         exception.expect(RuntimeException.class);
-        exception.expectMessage("Please Answer both "+areYouTwin+" and "+areYouFirstBorn+" or don't answer both.");
+        exception.expectMessage("Please Answer both "+areYouTwin+" and "+areYouFirstBorn+" or neither.");
 
         patientUICIdentifier.updateUICIdentifier(patient);
     }
@@ -87,7 +87,7 @@ public class PatientUICIdentifierIT extends BaseModuleWebContextSensitiveTest {
         patient.addAttribute(PatientTestData.getPersonAttribute(areYouFirstBorn, "2147"));
 
         exception.expect(RuntimeException.class);
-        exception.expectMessage("Please Answer both "+areYouTwin+" and "+areYouFirstBorn+" or don't answer both.");
+        exception.expectMessage("Please Answer both "+areYouTwin+" and "+areYouFirstBorn+" or neither.");
 
         patientUICIdentifier.updateUICIdentifier(patient);
     }
@@ -110,7 +110,7 @@ public class PatientUICIdentifierIT extends BaseModuleWebContextSensitiveTest {
         patient.addAttribute(PatientTestData.getPersonAttribute(areYouFirstBorn, "2146"));
 
         exception.expect(RuntimeException.class);
-        exception.expectMessage("Please Answer both "+areYouTwin+" and "+areYouFirstBorn+" or don't answer both.");
+        exception.expectMessage("Please Answer both "+areYouTwin+" and "+areYouFirstBorn+" or neither.");
 
         patientUICIdentifier.updateUICIdentifier(patient);
     }
@@ -122,7 +122,7 @@ public class PatientUICIdentifierIT extends BaseModuleWebContextSensitiveTest {
         patient.addAttribute(PatientTestData.getPersonAttribute(areYouFirstBorn, "2147"));
 
         exception.expect(RuntimeException.class);
-        exception.expectMessage("Please Answer both "+areYouTwin+" and "+areYouFirstBorn+" or don't answer both.");
+        exception.expectMessage("Please Answer both "+areYouTwin+" and "+areYouFirstBorn+" or neither.");
 
         patientUICIdentifier.updateUICIdentifier(patient);
     }

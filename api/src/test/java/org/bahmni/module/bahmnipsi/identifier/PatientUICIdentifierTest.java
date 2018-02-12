@@ -73,7 +73,7 @@ public class PatientUICIdentifierTest {
         patient.setGender(null);
 
         exception.expect(RuntimeException.class);
-        exception.expectMessage("Required fields Patient family name and Mothers first name should not be null");
+        exception.expectMessage("Required fields like Patient Last Name, Age, District Name, Gender, Mothers First Name should not be empty");
 
         PowerMockito.mockStatic(Context.class);
         when(Context.getConceptService()).thenReturn(conceptService);
@@ -90,7 +90,7 @@ public class PatientUICIdentifierTest {
         PersonAttribute motherAttribute = patient.getAttribute("Mother's name");
         motherAttribute.setValue("d");
         exception.expect(RuntimeException.class);
-        exception.expectMessage("Patient family name, Mothers first name fields should have two characters at least");
+        exception.expectMessage("Patient Last Name, Mothers First Name fields should have two characters at least");
 
         PowerMockito.mockStatic(Context.class);
         when(Context.getConceptService()).thenReturn(conceptService);
@@ -195,7 +195,7 @@ public class PatientUICIdentifierTest {
         when(Context.getService(PatientIdentifierService.class)).thenReturn(patientIdentifierService);
 
         exception.expect(RuntimeException.class);
-        exception.expectMessage("Please Answer both "+areYouTwin+" and "+areYouFirstBorn+" or don't answer both.");
+        exception.expectMessage("Please Answer both "+areYouTwin+" and "+areYouFirstBorn+" or neither.");
 
         patientUICIdentifier.updateUICIdentifier(patient);
     }
@@ -260,7 +260,7 @@ public class PatientUICIdentifierTest {
         when(Context.getService(PatientIdentifierService.class)).thenReturn(patientIdentifierService);
 
         exception.expect(RuntimeException.class);
-        exception.expectMessage("Please Answer both "+areYouTwin+" and "+areYouFirstBorn+" or don't answer both.");
+        exception.expectMessage("Please Answer both "+areYouTwin+" and "+areYouFirstBorn+" or neither.");
 
         patientUICIdentifier.updateUICIdentifier(patient);
     }
@@ -296,7 +296,7 @@ public class PatientUICIdentifierTest {
         when(Context.getService(PatientIdentifierService.class)).thenReturn(patientIdentifierService);
 
         exception.expect(RuntimeException.class);
-        exception.expectMessage("Please Answer both "+areYouTwin+" and "+areYouFirstBorn+" or don't answer both.");
+        exception.expectMessage("Please Answer both "+areYouTwin+" and "+areYouFirstBorn+" or neither.");
 
         patientUICIdentifier.updateUICIdentifier(patient);
     }
@@ -326,7 +326,7 @@ public class PatientUICIdentifierTest {
         when(Context.getService(PatientIdentifierService.class)).thenReturn(patientIdentifierService);
 
         exception.expect(RuntimeException.class);
-        exception.expectMessage("Please Answer both "+areYouTwin+" and "+areYouFirstBorn+" or don't answer both.");
+        exception.expectMessage("Please Answer both "+areYouTwin+" and "+areYouFirstBorn+" or neither.");
 
         patientUICIdentifier.updateUICIdentifier(patient);
     }
@@ -356,7 +356,7 @@ public class PatientUICIdentifierTest {
         when(Context.getService(PatientIdentifierService.class)).thenReturn(patientIdentifierService);
 
         exception.expect(RuntimeException.class);
-        exception.expectMessage("Please Answer both "+areYouTwin+" and "+areYouFirstBorn+" or don't answer both.");
+        exception.expectMessage("Please Answer both "+areYouTwin+" and "+areYouFirstBorn+" or neither.");
 
         patientUICIdentifier.updateUICIdentifier(patient);
     }
