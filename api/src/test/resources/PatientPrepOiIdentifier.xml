@@ -3,7 +3,7 @@
 <dataset>
     <global_property property="patient.identifierRegex" property_value="^0*@SEARCH@([A-Z]+-[0-9])?$" uuid="c92cce6d-7e7d-4c53-a3c9-faaac17f8f8b"/>
     <location location_id="1" name="Test Location" creator="1" date_created="2005-01-01 00:00:00.0" retired="false" uuid="92ab9667-4686-49af-8be8-65a4b58fc49c"/>
-    <person_address person_address_id="610" person_id="2" preferred="true" city_village="Harare[0A]" state_province="south[02]" postal_code="mabhuna[05]" creator="1" date_created="2005-01-01 00:00:00.0" voided="0" uuid="3b0eef7c-a87f-4756-ae2c-2a0ae6ghj"/>
+    <person_address person_address_id="610" person_id="2" preferred="true" city_village="Harare[0A]" state_province="south[02]" address2="mabhuna[05]" creator="1" date_created="2005-01-01 00:00:00.0" voided="0" uuid="3b0eef7c-a87f-4756-ae2c-2a0ae6ghj"/>
     <person person_id="2" gender="M" dead="false" creator="1" date_created="2005-01-01 00:00:00.0" voided="false" uuid="61b38324-e2fd-4feb-95b7-9e9a2a4400df" birthdate="2017-11-22"/>
     <person_name person_name_id="2" preferred="true" person_id="2" given_name="John" middle_name="Foo" family_name="Doe" creator="1" date_created="2005-01-01 00:00:00.0" voided="false" uuid="7e2acadc-5073-4a39-914a-debcbec8c1c9"/>
     <patient patient_id="2" creator="1" date_created="2005-01-01 00:00:00.0" voided="false"/>

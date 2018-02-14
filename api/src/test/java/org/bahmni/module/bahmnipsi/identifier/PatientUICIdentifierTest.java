@@ -68,12 +68,12 @@ public class PatientUICIdentifierTest {
     }
 
     @Test
-    public void shouldThrowExceptionWhenOneOfRequiredFieldsIsNull() {
+    public void shouldThrowExceptionWhenGenderIsNull() {
         Patient patient = PatientTestData.setUpPatientData();
         patient.setGender(null);
 
         exception.expect(RuntimeException.class);
-        exception.expectMessage("Required fields like Patient Last Name, Age, District Name, Gender, Mothers First Name should not be empty");
+        exception.expectMessage("Gender field should not be empty");
 
         PowerMockito.mockStatic(Context.class);
         when(Context.getConceptService()).thenReturn(conceptService);
@@ -85,18 +85,116 @@ public class PatientUICIdentifierTest {
     }
 
     @Test
-    public void shouldThrowExceptionWhenNamesHaveLessThanTwoChars() {
+    public void shouldThrowExceptionWhenPatientLastNameIsNull() {
         Patient patient = PatientTestData.setUpPatientData();
-        PersonAttribute motherAttribute = patient.getAttribute("Mother's name");
-        motherAttribute.setValue("d");
+        PersonName personName = patient.getPersonName();
+        personName.setFamilyName(null);
+
         exception.expect(RuntimeException.class);
-        exception.expectMessage("Patient Last Name, Mothers First Name fields should have two characters at least");
+        exception.expectMessage("Patient Last Name field should not be empty");
 
         PowerMockito.mockStatic(Context.class);
         when(Context.getConceptService()).thenReturn(conceptService);
         when(conceptService.getConcept("510")).thenReturn(concept);
         when(concept.getName()).thenReturn(conceptName);
         when(conceptName.getName()).thenReturn("Harare");
+
+        patientUICIdentifier.updateUICIdentifier(patient);
+    }
+
+    @Test
+    public void shouldThrowExceptionWhenMothersFirstNameIsNull() {
+        Patient patient = PatientTestData.setUpPatientData();
+        PersonAttribute attribute = patient.getAttribute("Mother's name");
+        attribute.setValue(null);
+
+        exception.expect(RuntimeException.class);
+        exception.expectMessage("Mother's First Name field should not be empty");
+
+        PowerMockito.mockStatic(Context.class);
+        when(Context.getConceptService()).thenReturn(conceptService);
+        when(conceptService.getConcept("510")).thenReturn(concept);
+        when(concept.getName()).thenReturn(conceptName);
+        when(conceptName.getName()).thenReturn("Harare");
+
+        patientUICIdentifier.updateUICIdentifier(patient);
+     }
+
+    @Test
+    public void shouldThrowExceptionWhenDistrictOfBirthIsNull() {
+        Patient patient = PatientTestData.setUpPatientData();
+        PersonAttribute districtOfBirth = patient.getAttribute("District of Birth");
+        patient.removeAttribute(districtOfBirth);
+
+        exception.expect(RuntimeException.class);
+        exception.expectMessage("District of Birth field should not be empty");
+
+        patientUICIdentifier.updateUICIdentifier(patient);
+    }
+
+    @Test
+    public void shouldThrowExceptionWhenBirthDateIsNull() {
+        Patient patient = PatientTestData.setUpPatientData();
+        patient.setBirthdate(null);
+
+        exception.expect(RuntimeException.class);
+        exception.expectMessage("Date of Birth field should not be empty");
+
+        PowerMockito.mockStatic(Context.class);
+        when(Context.getConceptService()).thenReturn(conceptService);
+        when(conceptService.getConcept("510")).thenReturn(concept);
+        when(concept.getName()).thenReturn(conceptName);
+        when(conceptName.getName()).thenReturn("Harare");
+
+        patientUICIdentifier.updateUICIdentifier(patient);
+    }
+
+    @Test
+    public void shouldThrowExceptionWhenMothersFirstNameHaveLessThanTwoChars() {
+        Patient patient = PatientTestData.setUpPatientData();
+        PersonAttribute motherAttribute = patient.getAttribute("Mother's name");
+        motherAttribute.setValue("d");
+        exception.expect(RuntimeException.class);
+        exception.expectMessage("Mother's First Name field should have two characters at least");
+
+        PowerMockito.mockStatic(Context.class);
+        when(Context.getConceptService()).thenReturn(conceptService);
+        when(conceptService.getConcept("510")).thenReturn(concept);
+        when(concept.getName()).thenReturn(conceptName);
+        when(conceptName.getName()).thenReturn("Harare");
+
+        patientUICIdentifier.updateUICIdentifier(patient);
+    }
+
+    @Test
+    public void shouldThrowExceptionWhenPatientLastNameHaveLessThanTwoChars() {
+        Patient patient = PatientTestData.setUpPatientData();
+        patient.getPersonName().setFamilyName("f");
+
+        exception.expect(RuntimeException.class);
+        exception.expectMessage("Patient Last Name field should have two characters at least");
+
+        PowerMockito.mockStatic(Context.class);
+        when(Context.getConceptService()).thenReturn(conceptService);
+        when(conceptService.getConcept("510")).thenReturn(concept);
+        when(concept.getName()).thenReturn(conceptName);
+        when(conceptName.getName()).thenReturn("Harare");
+
+        patientUICIdentifier.updateUICIdentifier(patient);
+    }
+
+    @Test
+    public void shouldThrowExceptionWhenDisctrictOfBirthHaveLessThanTwoChars() {
+        Patient patient = PatientTestData.setUpPatientData();
+
+        exception.expect(RuntimeException.class);
+        exception.expectMessage("District of Birth field should have two characters at least");
+
+        PowerMockito.mockStatic(Context.class);
+        when(Context.getConceptService()).thenReturn(conceptService);
+        when(conceptService.getConcept("510")).thenReturn(concept);
+        when(concept.getName()).thenReturn(conceptName);
+        when(conceptName.getName()).thenReturn("H");
 
         patientUICIdentifier.updateUICIdentifier(patient);
     }

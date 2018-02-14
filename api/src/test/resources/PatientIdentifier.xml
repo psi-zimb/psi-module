@@ -13,7 +13,7 @@
     <person_attribute person_attribute_id="34" person_id="2" value="2147" person_attribute_type_id="23" creator="1" date_created="2005-01-01 00:00:00.0" voided="0" uuid="gf5tyh-gt6yjt-4756rt-ae2c-fr5thf6"/>
     <person_attribute person_attribute_id="35" person_id="2" value="2146" person_attribute_type_id="24" creator="1" date_created="2005-01-01 00:00:00.0" voided="0" uuid="gf5tyh-gt6yjt-5ty6rh-hy6ug-fr5thf6"/>
     <person_attribute person_attribute_id="36" person_id="2" value="2147" person_attribute_type_id="24" creator="1" date_created="2005-01-01 00:00:00.0" voided="0" uuid="gf5tyh-yh5usv-5ty6rh-hy6ug-fr6yhgd"/>
-    <person_address person_address_id="610" person_id="2" preferred="true" city_village="Harare[0A]" state_province="south[02]" postal_code="mabhuna[05]" creator="1" date_created="2005-01-01 00:00:00.0" voided="0" uuid="3b0eef7c-a87f-4756-ae2c-2a0ae6ghj"/>
+    <person_address person_address_id="610" person_id="2" preferred="true" city_village="Harare[0A]" state_province="south[02]" address2="mabhuna[05]" creator="1" date_created="2005-01-01 00:00:00.0" voided="0" uuid="3b0eef7c-a87f-4756-ae2c-2a0ae6ghj"/>
     <person person_id="2" gender="M" dead="false" creator="1" date_created="2005-01-01 00:00:00.0" voided="false" uuid="61b38324-e2fd-4feb-95b7-9e9a2a4400df" birthdate="2017-11-22"/>
     <person person_id="3" gender="M" dead="true" creator="1" date_created="2005-01-01 00:00:00.0" voided="false" uuid="5c521595-4e12-46b0-8248-b8f2d3697766" birthdate="2017-11-22"/>
     <person person_id="4" gender="M" dead="false" creator="1" date_created="2005-01-01 00:00:00.0" voided="false" uuid="256ccf6d-6b41-455c-9be2-51ff4386ae76" birthdate="2017-11-22"/>

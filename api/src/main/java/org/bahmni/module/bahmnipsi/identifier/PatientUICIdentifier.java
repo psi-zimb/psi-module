@@ -35,33 +35,51 @@ public class PatientUICIdentifier {
 
     private List<String> getRequiredFields(Patient patient){
         String patientSurname = patient.getFamilyName();
-        String nameOfMother = patient.getAttribute(mothersName) != null ? ((patient.getAttribute(mothersName).getValue().split(" "))[0]) : null;
+        String mothersName = patient.getAttribute(this.mothersName) != null ? patient.getAttribute(this.mothersName).getValue() : null;
+        String mothersFirstName = mothersName != null? mothersName.split(" ")[0] : null;
         String districtName = getAttributeValue(district, patient);
         String gender = patient.getGender();
         Date birthDate = patient.getBirthdate();
-        String formattedBirthDate = new SimpleDateFormat("ddMMyy").format(birthDate);
+        String formattedBirthDate = birthDate != null ?new SimpleDateFormat("ddMMyy").format(birthDate) : null;
         String twinValue = getAttributeValue(areYouTwin, patient);
         String firstBornValue = getAttributeValue(areYouFirstBorn, patient);
 
-        if(patientSurname !=null && nameOfMother != null && districtName != null && birthDate != null && gender != null) {
-            nameOfMother = nameOfMother.trim();
-            patientSurname = patientSurname.trim();
-            districtName = districtName.trim();
+        if(patientSurname !=null) {
+            if(mothersFirstName != null) {
+                if(districtName != null) {
+                    if(birthDate != null) {
+                        if(gender != null) {
+                            mothersFirstName = mothersFirstName.trim();
+                            patientSurname = patientSurname.trim();
+                            districtName = districtName.trim();
 
-            if (nameOfMother.length() >= requiredFieldsMinLength && patientSurname.length() >= requiredFieldsMinLength && districtName.length() >= requiredFieldsMinLength) {
-                if((twinValue == null && firstBornValue == null) || (no.equals(twinValue) && firstBornValue == null)) {
-                    return Arrays.asList(nameOfMother, patientSurname, districtName, formattedBirthDate, gender);
-                } else if(yes.equals(twinValue) && yes.equals(firstBornValue)) {
-                    return Arrays.asList(nameOfMother, patientSurname, districtName, formattedBirthDate, gender, twinOne);
-                } else if(yes.equals(twinValue) && no.equals(firstBornValue)) {
-                    return Arrays.asList(nameOfMother, patientSurname, districtName, formattedBirthDate, gender, twinTwo);
+                            if (mothersFirstName.length() >= requiredFieldsMinLength) {
+                                if (patientSurname.length() >= requiredFieldsMinLength) {
+                                    if (districtName.length() >= requiredFieldsMinLength) {
+                                        if ((twinValue == null && firstBornValue == null) || (no.equals(twinValue) && firstBornValue == null)) {
+                                            return Arrays.asList(mothersFirstName, patientSurname, districtName, formattedBirthDate, gender);
+                                        } else if (yes.equals(twinValue) && yes.equals(firstBornValue)) {
+                                            return Arrays.asList(mothersFirstName, patientSurname, districtName, formattedBirthDate, gender, twinOne);
+                                        } else if (yes.equals(twinValue) && no.equals(firstBornValue)) {
+                                            return Arrays.asList(mothersFirstName, patientSurname, districtName, formattedBirthDate, gender, twinTwo);
+                                        }
+                                        throw new RuntimeException("Please Answer both " + areYouTwin + " and " + areYouFirstBorn + " or neither.");
+                                    }
+                                    throw new RuntimeException("District of Birth field should have two characters at least");
+                                }
+                                throw new RuntimeException("Patient Last Name field should have two characters at least");
+                            }
+                            throw new RuntimeException("Mother's First Name field should have two characters at least");
+                        }
+                        throw new RuntimeException("Gender field should not be empty");
+                    }
+                    throw new RuntimeException("Date of Birth field should not be empty");
                 }
-
-                throw new RuntimeException("Please Answer both "+areYouTwin+" and "+areYouFirstBorn+" or neither.");
+                throw new RuntimeException("District of Birth field should not be empty");
             }
-            throw new RuntimeException("Patient Last Name, Mothers First Name fields should have two characters at least");
+            throw new RuntimeException("Mother's First Name field should not be empty");
         }
-        throw new RuntimeException("Required fields like Patient Last Name, Age, District Name, Gender, Mothers First Name should not be empty");
+        throw new RuntimeException("Patient Last Name field should not be empty");
     }
 
     private String getAttributeValue(String attribute, Patient patient) {

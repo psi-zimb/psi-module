@@ -50,18 +50,28 @@ public class PatientOiPrepIdentifier {
 
         String provinceCode = getCode(personAddress.getStateProvince());
         String districtCode = getCode(personAddress.getCityVillage());
-        String facilityCode = getCode(personAddress.getPostalCode());
+        String facilityCode = getCode(personAddress.getAddress2());
         int year = Year.now().getValue();
 
-        if(provinceCode != null && districtCode != null && facilityCode != null) {
-            if(provinceCode.length() == codesLength && districtCode.length() == codesLength && facilityCode.length() == codesLength) {
-                return Arrays.asList(provinceCode, districtCode, facilityCode, year + "");
-            } else {
-                throw new RuntimeException("Province, District and Facility code lengths must be 2");
+        if(provinceCode != null) {
+            if(districtCode != null) {
+                if(facilityCode != null) {
+                    if (provinceCode.length() == codesLength) {
+                        if(districtCode.length() == codesLength) {
+                            if(facilityCode.length() == codesLength) {
+                                return Arrays.asList(provinceCode, districtCode, facilityCode, year + "");
+                            }
+                            throw new RuntimeException("Facility code length must be 2");
+                        }
+                        throw new RuntimeException("District code length must be 2");
+                    }
+                    throw new RuntimeException("Province code length must be 2");
+                }
+                throw new RuntimeException("Facility should not be empty on the Registration first page to generate Prep/Oi Identifier.");
             }
-        } else {
-            throw new RuntimeException("Province, District and Facility should not be empty on the Registration first page to generate Prep/Oi Identifier.");
+            throw new RuntimeException("District should not be empty on the Registration first page to generate Prep/Oi Identifier.");
         }
+        throw new RuntimeException("Province should not be empty on the Registration first page to generate Prep/Oi Identifier.");
     }
 
     private String getCode(String region) {
