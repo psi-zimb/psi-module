@@ -103,6 +103,7 @@ public class PatientOiPrepIdentifier {
         int identifierTypeId = Context.getService(PatientIdentifierService.class).getIdentifierTypeId(this.identifierType);
         PatientIdentifier patientIdentifier = new PatientIdentifier();
         PatientIdentifierType identifierType = new PatientIdentifierType(identifierTypeId);
+        identifierType.setName(this.identifierType);
         patientIdentifier.setIdentifierType(identifierType);
         return patientIdentifier;
     }

@@ -53,9 +53,6 @@ public class PatientOiPrepIdentifierTest {
     @Mock
     private PatientIdentifierType patientIdentifierType;
 
-    @Mock
-    private StringBuffer stringBuffer;
-
     @Rule
     public final ExpectedException exception = ExpectedException.none();
 
@@ -274,6 +271,7 @@ public class PatientOiPrepIdentifierTest {
         when(patientIdentifierService.getIdentifierTypeId(identifierType)).thenReturn(identifierTypeId);
         whenNew(PatientIdentifier.class).withNoArguments().thenReturn(patientIdentifier);
         whenNew(PatientIdentifierType.class).withArguments(identifierTypeId).thenReturn(patientIdentifierType);
+        doNothing().when(patientIdentifierType).setName(this.identifierType);
         doNothing().when(patientIdentifier).setIdentifierType(patientIdentifierType);
     }
 }

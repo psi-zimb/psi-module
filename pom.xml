@@ -7,7 +7,7 @@
 	<version>0.1-SNAPSHOT</version>
 	<packaging>pom</packaging>
 	<name>bahmnipsi Module</name>
-	<description>Example OpenMRS Module that may be used as a basis for creating a new module.</description>
+	<description>Generate UIC, Prep/Oi Identifiers</description>
 
 	<developers>
 		<developer>
