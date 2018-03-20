@@ -48,30 +48,58 @@ public class PatientOiPrepIdentifier {
         Person personByUuid = Context.getPersonService().getPersonByUuid(patientUuid);
         PersonAddress personAddress = personByUuid.getPersonAddress();
 
-        String provinceCode = getCode(personAddress.getStateProvince());
-        String districtCode = getCode(personAddress.getCityVillage());
-        String facilityCode = getCode(personAddress.getAddress2());
+        if(personAddress == null) {
+            throw new RuntimeException("Please fill address fields");
+        }
+
+        String province = personAddress.getStateProvince();
+        String district = personAddress.getCityVillage();
+        String facility = personAddress.getAddress2();
+
+        String nullFields = getNullFields(province, district, facility);
+        if(!nullFields.isEmpty()) {
+            throw new RuntimeException(nullFields + " should not be empty on the Registration first page to generate Prep/Oi Identifier.");
+        }
+
+        String provinceCode = getCode(province);
+        String districtCode = getCode(district);
+        String facilityCode = getCode(facility);
         int year = Year.now().getValue();
 
-        if(provinceCode != null) {
-            if(districtCode != null) {
-                if(facilityCode != null) {
-                    if (provinceCode.length() == codesLength) {
-                        if(districtCode.length() == codesLength) {
-                            if(facilityCode.length() == codesLength) {
-                                return Arrays.asList(provinceCode, districtCode, facilityCode, year + "");
-                            }
-                            throw new RuntimeException("Facility code length must be 2");
-                        }
-                        throw new RuntimeException("District code length must be 2");
-                    }
-                    throw new RuntimeException("Province code length must be 2");
-                }
-                throw new RuntimeException("Facility should not be empty on the Registration first page to generate Prep/Oi Identifier.");
-            }
-            throw new RuntimeException("District should not be empty on the Registration first page to generate Prep/Oi Identifier.");
+        nullFields = getNullFields(provinceCode, districtCode, facilityCode);
+        if(!nullFields.isEmpty()) {
+            throw new RuntimeException("Please enter the " + nullFields + " code in the square brackets example 'MIDLANDS[07]' and code length must be 2");
         }
-        throw new RuntimeException("Province should not be empty on the Registration first page to generate Prep/Oi Identifier.");
+
+        if(provinceCode.length() != codesLength) {
+            nullFields = " Province";
+        }
+        if(districtCode.length() != codesLength) {
+            nullFields+= nullFields.isEmpty() ? "District" : ", District";
+        }
+        if(facilityCode.length() != codesLength) {
+            nullFields+= nullFields.isEmpty() ? "Facility" : ", Facility";
+        }
+
+        if(!nullFields.isEmpty()) {
+            throw new RuntimeException(nullFields +" code length must be 2");
+        }
+        return Arrays.asList(provinceCode, districtCode, facilityCode, year + "");
+    }
+
+    private String getNullFields(String province, String district, String facility) {
+        String nullFields = "";
+
+        if(province == null) {
+            nullFields = "Province";
+        }
+        if(district == null) {
+            nullFields+= nullFields.isEmpty() ? "District" : ", District";
+        }
+        if(facility == null) {
+            nullFields+= nullFields.isEmpty() ? "Facility" : ", Facility";
+        }
+        return nullFields;
     }
 
     private String getCode(String region) {

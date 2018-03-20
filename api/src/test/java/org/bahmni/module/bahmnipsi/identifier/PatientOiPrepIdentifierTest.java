@@ -63,13 +63,12 @@ public class PatientOiPrepIdentifierTest {
     private PatientOiPrepIdentifier patientOiPrepIdentifier = new PatientOiPrepIdentifier();
 
     @Test
-    public void shouldThrowErrorWhenProvinceFieldIsNull() throws Exception {
+    public void shouldHaveProvinceInTheErrorMessageWhenProvinceFieldIsNull() throws Exception {
         String affix = "A";
 
         patient = PatientTestData.setUpPatientData();
         setUpMocks(patient);
         when(personAddress.getStateProvince()).thenReturn(null);
-        when(StringUtils.substringBetween(null, "[", "]")).thenReturn(null);
 
         exception.expect(RuntimeException.class);
         exception.expectMessage("Province should not be empty on the Registration first page to generate Prep/Oi Identifier.");
@@ -78,13 +77,11 @@ public class PatientOiPrepIdentifierTest {
     }
 
     @Test
-    public void shouldThrowErrorWhenDistrictFieldIsNull() throws Exception {
+    public void shouldHaveDistrictInTheErrorMessageWhenDistrictFieldIsNull() throws Exception {
         String affix = "A";
         patient = PatientTestData.setUpPatientData();
-
         setUpMocks(patient);
         when(personAddress.getCityVillage()).thenReturn(null);
-        when(StringUtils.substringBetween(null, "[", "]")).thenReturn(null);
 
         exception.expect(RuntimeException.class);
         exception.expectMessage("District should not be empty on the Registration first page to generate Prep/Oi Identifier.");
@@ -93,7 +90,7 @@ public class PatientOiPrepIdentifierTest {
     }
 
     @Test
-    public void shouldThrowErrorWhenFacilityFieldIsNull() throws Exception {
+    public void shouldHaveFacilityInTheErrorMessageWhenFacilityFieldIsNull() throws Exception {
         String affix = "A";
         patient = PatientTestData.setUpPatientData();
 
@@ -103,6 +100,177 @@ public class PatientOiPrepIdentifierTest {
 
         exception.expect(RuntimeException.class);
         exception.expectMessage("Facility should not be empty on the Registration first page to generate Prep/Oi Identifier.");
+
+        patientOiPrepIdentifier.updateOiPrepIdentifier(patientUuid, affix);
+    }
+
+    @Test
+    public void shouldHaveProvinceAndDistrictInTheErrorMessageWhenDistrictAndProvinceFieldsAreNull() throws Exception {
+        String affix = "A";
+        patient = PatientTestData.setUpPatientData();
+
+        setUpMocks(patient);
+        when(personAddress.getStateProvince()).thenReturn(null);
+        when(personAddress.getCityVillage()).thenReturn(null);
+
+        exception.expect(RuntimeException.class);
+        exception.expectMessage("Province, District should not be empty on the Registration first page to generate Prep/Oi Identifier.");
+
+        patientOiPrepIdentifier.updateOiPrepIdentifier(patientUuid, affix);
+    }
+
+    @Test
+    public void shouldHaveProvinceAndFacilityInTheErrorMessageWhenProvinceAndFacilityFieldsAreNull() throws Exception {
+        String affix = "A";
+        patient = PatientTestData.setUpPatientData();
+
+        setUpMocks(patient);
+        when(personAddress.getStateProvince()).thenReturn(null);
+        when(personAddress.getAddress2()).thenReturn(null);
+
+        exception.expect(RuntimeException.class);
+        exception.expectMessage("Province, Facility should not be empty on the Registration first page to generate Prep/Oi Identifier.");
+
+        patientOiPrepIdentifier.updateOiPrepIdentifier(patientUuid, affix);
+    }
+
+    @Test
+    public void shouldHaveDistrictAndFacilityInTheErrorMessageWhenDistrictAndFacilityFieldsAreNull() throws Exception {
+        String affix = "A";
+        patient = PatientTestData.setUpPatientData();
+
+        setUpMocks(patient);
+        when(personAddress.getCityVillage()).thenReturn(null);
+        when(personAddress.getAddress2()).thenReturn(null);
+
+        exception.expect(RuntimeException.class);
+        exception.expectMessage("District, Facility should not be empty on the Registration first page to generate Prep/Oi Identifier.");
+
+        patientOiPrepIdentifier.updateOiPrepIdentifier(patientUuid, affix);
+    }
+
+    @Test
+        public void shouldThrowErrorWithAllThreeFieldsWhenDistrictAndProvinceAndFacilityFieldsAreNull() throws Exception {
+            String affix = "A";
+            patient = PatientTestData.setUpPatientData();
+
+            setUpMocks(patient);
+            when(personAddress.getStateProvince()).thenReturn(null);
+            when(personAddress.getCityVillage()).thenReturn(null);
+            when(personAddress.getAddress2()).thenReturn(null);
+
+            exception.expect(RuntimeException.class);
+            exception.expectMessage("Province, District, Facility should not be empty on the Registration first page to generate Prep/Oi Identifier.");
+
+            patientOiPrepIdentifier.updateOiPrepIdentifier(patientUuid, affix);
+        }
+
+    @Test
+    public void shouldHaveOnlyProvinceInTheErrorWhenProvinceCodeIsNotThere() throws Exception {
+        String affix = "A";
+
+        patient = PatientTestData.setUpPatientData();
+        setUpMocks(patient);
+        when(personAddress.getStateProvince()).thenReturn("province");
+        when(StringUtils.substringBetween(null, "[", "]")).thenReturn(null);
+
+        exception.expect(RuntimeException.class);
+        exception.expectMessage("Please enter the Province code in the square brackets example 'MIDLANDS[07]' and code length must be 2");
+
+        patientOiPrepIdentifier.updateOiPrepIdentifier(patientUuid, affix);
+    }
+
+    @Test
+    public void shouldHaveOnlyDistrictInTheErrorWhenDistrictCodeIsNotThere() throws Exception {
+        String affix = "A";
+        patient = PatientTestData.setUpPatientData();
+
+        setUpMocks(patient);
+        when(personAddress.getCityVillage()).thenReturn("district");
+        when(StringUtils.substringBetween(null, "[", "]")).thenReturn(null);
+
+        exception.expect(RuntimeException.class);
+        exception.expectMessage("Please enter the District code in the square brackets example 'MIDLANDS[07]' and code length must be 2");
+
+        patientOiPrepIdentifier.updateOiPrepIdentifier(patientUuid, affix);
+    }
+
+    @Test
+    public void shouldHaveOnlyFacilityInTheErrorWhenFacilityCodeIsNotThere() throws Exception {
+        String affix = "A";
+        patient = PatientTestData.setUpPatientData();
+
+        setUpMocks(patient);
+        when(personAddress.getAddress2()).thenReturn("facility");
+        when(StringUtils.substringBetween(null, "[", "]")).thenReturn(null);
+
+        exception.expect(RuntimeException.class);
+        exception.expectMessage("Please enter the Facility code in the square brackets example 'MIDLANDS[07]' and code length must be 2");
+
+        patientOiPrepIdentifier.updateOiPrepIdentifier(patientUuid, affix);
+    }
+
+    @Test
+    public void shouldHaveBothProvinceAndDistrictWhenTheseFieldsCodesAreNotThere() throws Exception {
+        String affix = "A";
+        patient = PatientTestData.setUpPatientData();
+
+        setUpMocks(patient);
+        when(personAddress.getStateProvince()).thenReturn("province");
+        when(personAddress.getCityVillage()).thenReturn("district");
+        when(StringUtils.substringBetween(null, "[", "]")).thenReturn(null);
+
+        exception.expect(RuntimeException.class);
+        exception.expectMessage("Please enter the Province, District code in the square brackets example 'MIDLANDS[07]' and code length must be 2");
+
+        patientOiPrepIdentifier.updateOiPrepIdentifier(patientUuid, affix);
+    }
+
+    @Test
+    public void shouldHaveBothProvinceAndFacilityWhenTheseFieldsCodesAreNotThere() throws Exception {
+        String affix = "A";
+        patient = PatientTestData.setUpPatientData();
+
+        setUpMocks(patient);
+        when(personAddress.getStateProvince()).thenReturn("province");
+        when(personAddress.getAddress2()).thenReturn("facility");
+        when(StringUtils.substringBetween(null, "[", "]")).thenReturn(null);
+
+        exception.expect(RuntimeException.class);
+        exception.expectMessage("Please enter the Province, Facility code in the square brackets example 'MIDLANDS[07]' and code length must be 2");
+
+        patientOiPrepIdentifier.updateOiPrepIdentifier(patientUuid, affix);
+    }
+
+    @Test
+    public void shouldHaveBothDistrictAndFacilityWhenTheseFieldsCodesAreNotThere() throws Exception {
+        String affix = "A";
+        patient = PatientTestData.setUpPatientData();
+
+        setUpMocks(patient);
+        when(personAddress.getCityVillage()).thenReturn("district");
+        when(personAddress.getAddress2()).thenReturn("facility");
+        when(StringUtils.substringBetween(null, "[", "]")).thenReturn(null);
+
+        exception.expect(RuntimeException.class);
+        exception.expectMessage("Please enter the District, Facility code in the square brackets example 'MIDLANDS[07]' and code length must be 2");
+
+        patientOiPrepIdentifier.updateOiPrepIdentifier(patientUuid, affix);
+    }
+
+    @Test
+    public void shouldHaveAllFieldsWhenAllFieldsCodesAreNotThere() throws Exception {
+        String affix = "A";
+        patient = PatientTestData.setUpPatientData();
+
+        setUpMocks(patient);
+        when(personAddress.getStateProvince()).thenReturn("province");
+        when(personAddress.getCityVillage()).thenReturn("district");
+        when(personAddress.getAddress2()).thenReturn("facility");
+        when(StringUtils.substringBetween(null, "[", "]")).thenReturn(null);
+
+        exception.expect(RuntimeException.class);
+        exception.expectMessage("Please enter the Province, District, Facility code in the square brackets example 'MIDLANDS[07]' and code length must be 2");
 
         patientOiPrepIdentifier.updateOiPrepIdentifier(patientUuid, affix);
     }
@@ -124,7 +292,7 @@ public class PatientOiPrepIdentifierTest {
     }
 
     @Test
-    public void shouldThrowErrorWhenCodeIsNotAvailableForDistrictField() throws Exception {
+    public void shouldThrowErrorWhenCodeLengthIsNotEqualToTwoForDistrictField() throws Exception {
         String affix = "A";
         String district = "harare[1]";
 
@@ -151,6 +319,78 @@ public class PatientOiPrepIdentifierTest {
 
         exception.expect(RuntimeException.class);
         exception.expectMessage("Facility code length must be 2");
+
+        patientOiPrepIdentifier.updateOiPrepIdentifier(patientUuid, affix);
+    }
+
+    @Test
+    public void shouldHaveProvinceAndDistrictInTheErrorWhenTheseFieldsDoesNotHaveCodeLengthEqualTo2() throws Exception {
+        String affix = "A";
+        String province = "province";
+
+        patient = PatientTestData.setUpPatientData();
+        setUpMocks(patient);
+        when(personAddress.getStateProvince()).thenReturn(province);
+        when(personAddress.getCityVillage()).thenReturn("district");
+        when(StringUtils.substringBetween(province, "[", "]")).thenReturn("[234]");
+        when(StringUtils.substringBetween("district", "[", "]")).thenReturn("[2]");
+
+        exception.expect(RuntimeException.class);
+        exception.expectMessage("Province, District code length must be 2");
+
+        patientOiPrepIdentifier.updateOiPrepIdentifier(patientUuid, affix);
+    }
+
+    @Test
+    public void shouldHaveProvinceAndFacilityInTheErrorWhenTheseFieldsDoesNotHaveCodeLengthEqualTo2() throws Exception {
+        String affix = "A";
+        String province = "province";
+
+        patient = PatientTestData.setUpPatientData();
+        setUpMocks(patient);
+        when(personAddress.getStateProvince()).thenReturn(province);
+        when(personAddress.getAddress2()).thenReturn("facility");
+        when(StringUtils.substringBetween(province, "[", "]")).thenReturn("[234]");
+        when(StringUtils.substringBetween("facility", "[", "]")).thenReturn("[2]");
+
+        exception.expect(RuntimeException.class);
+        exception.expectMessage("Province, Facility code length must be 2");
+
+        patientOiPrepIdentifier.updateOiPrepIdentifier(patientUuid, affix);
+    }
+
+    @Test
+    public void shouldHaveDistrictAndFacilityInTheErrorWhenTheseFieldsDoesNotHaveCodeLengthEqualTo2() throws Exception {
+        String affix = "A";
+
+        patient = PatientTestData.setUpPatientData();
+        setUpMocks(patient);
+        when(personAddress.getCityVillage()).thenReturn("district");
+        when(personAddress.getAddress2()).thenReturn("facility");
+        when(StringUtils.substringBetween("district", "[", "]")).thenReturn("[234]");
+        when(StringUtils.substringBetween("facility", "[", "]")).thenReturn("[2]");
+
+        exception.expect(RuntimeException.class);
+        exception.expectMessage("District, Facility code length must be 2");
+
+        patientOiPrepIdentifier.updateOiPrepIdentifier(patientUuid, affix);
+    }
+
+    @Test
+    public void shouldHaveAllFieldsInTheErrorWhenAllFieldsDoesNotHaveCodeLengthEqualTo2() throws Exception {
+        String affix = "A";
+
+        patient = PatientTestData.setUpPatientData();
+        setUpMocks(patient);
+        when(personAddress.getStateProvince()).thenReturn("province");
+        when(personAddress.getCityVillage()).thenReturn("district");
+        when(personAddress.getAddress2()).thenReturn("facility");
+        when(StringUtils.substringBetween("province", "[", "]")).thenReturn("[234]");
+        when(StringUtils.substringBetween("district", "[", "]")).thenReturn("[234]");
+        when(StringUtils.substringBetween("facility", "[", "]")).thenReturn("[2]");
+
+        exception.expect(RuntimeException.class);
+        exception.expectMessage("Province, District, Facility code length must be 2");
 
         patientOiPrepIdentifier.updateOiPrepIdentifier(patientUuid, affix);
     }
