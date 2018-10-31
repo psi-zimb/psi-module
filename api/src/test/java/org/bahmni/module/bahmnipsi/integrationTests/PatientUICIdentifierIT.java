@@ -126,4 +126,15 @@ public class PatientUICIdentifierIT extends BaseModuleWebContextSensitiveTest {
 
         patientUICIdentifier.updateUICIdentifier(patient);
     }
+
+    @Test
+    public void shouldCreateUICIdentifierWhenItIsNotExistForAPatient() throws Exception {
+        executeDataSet("PatientIdentifier.xml");
+        Patient patient = PatientTestData.setUpPatientData();
+        patient.removeIdentifier(patient.getPatientIdentifier("UIC"));
+
+        patientUICIdentifier.updateUICIdentifier(patient);
+
+        assertEquals("ENOEYD130170M", patient.getPatientIdentifier("UIC").getIdentifier());
+    }
 }

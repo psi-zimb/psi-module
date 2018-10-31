@@ -17,7 +17,9 @@ import org.powermock.modules.junit4.PowerMockRunner;
 import java.text.SimpleDateFormat;
 
 import static junit.framework.Assert.assertEquals;
+import static org.powermock.api.mockito.PowerMockito.doNothing;
 import static org.powermock.api.mockito.PowerMockito.when;
+import static org.powermock.api.mockito.PowerMockito.whenNew;
 
 @RunWith(PowerMockRunner.class)
 @PrepareForTest(Context.class)
@@ -36,6 +38,9 @@ public class PatientUICIdentifierTest {
 
     @Mock
     private SimpleDateFormat simpleDateFormat;
+
+    @Mock
+    private PatientIdentifierType patientIdentifierType;
 
     @Rule
     public final ExpectedException exception = ExpectedException.none();
@@ -457,6 +462,33 @@ public class PatientUICIdentifierTest {
         exception.expectMessage("Please Answer both "+areYouTwin+" and "+areYouFirstBorn+" or neither.");
 
         patientUICIdentifier.updateUICIdentifier(patient);
+    }
+
+    @Test
+    public void shouldCreateANewUICIdentifierWhenPatientObjDoesNotContainUICIdentifierObj() throws Exception{
+        String dateFormat = "ddMMyy";
+        String formattedDate = "130117";
+
+        Patient patient = PatientTestData.setUpPatientData();
+        patient.removeIdentifier(patient.getPatientIdentifier("UIC"));
+
+        PowerMockito.mockStatic(Context.class);
+        PowerMockito.whenNew(SimpleDateFormat.class).withArguments(dateFormat).thenReturn(simpleDateFormat);
+
+        when(Context.getConceptService()).thenReturn(conceptService);
+        when(conceptService.getConcept("510")).thenReturn(concept);
+        when(concept.getName()).thenReturn(conceptName);
+        when(conceptName.getName()).thenReturn("Harare");
+        when(simpleDateFormat.format(patient.getBirthdate())).thenReturn(formattedDate);
+        when(Context.getService(PatientIdentifierService.class)).thenReturn(patientIdentifierService);
+        when(patientIdentifierService.getIdentifierTypeId("UIC")).thenReturn(1);
+        whenNew(PatientIdentifierType.class).withArguments(1).thenReturn(patientIdentifierType);
+        doNothing().when(patientIdentifierType).setName("UIC");
+
+
+        patientUICIdentifier.updateUICIdentifier(patient);
+
+        assertEquals("ENOERE130170M", patient.getPatientIdentifier("UIC").getIdentifier());
     }
 }
 

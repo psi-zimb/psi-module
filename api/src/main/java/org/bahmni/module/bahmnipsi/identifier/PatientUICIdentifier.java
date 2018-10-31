@@ -1,8 +1,10 @@
 package org.bahmni.module.bahmnipsi.identifier;
 
+import org.bahmni.module.bahmnipsi.api.PatientIdentifierService;
 import org.openmrs.Concept;
 import org.openmrs.Patient;
 import org.openmrs.PatientIdentifier;
+import org.openmrs.PatientIdentifierType;
 import org.openmrs.PersonAttribute;
 import org.openmrs.api.context.Context;
 
@@ -30,7 +32,21 @@ public class PatientUICIdentifier {
         String identifier = getIdentifier(requiredFields);
 
         PatientIdentifier patientIdentifier = patient.getPatientIdentifier(identifierType);
+
+        if (patientIdentifier == null) {
+            patientIdentifier = createUICPatientIdentifier();
+            patient.addIdentifier(patientIdentifier);
+        }
         patientIdentifier.setIdentifier(identifier);
+    }
+
+    private PatientIdentifier createUICPatientIdentifier() {
+        PatientIdentifier patientIdentifier = new PatientIdentifier();
+        int identifierTypeId = Context.getService(PatientIdentifierService.class).getIdentifierTypeId(identifierType);
+        PatientIdentifierType patientIdentifierType = new PatientIdentifierType(identifierTypeId);
+        patientIdentifierType.setName(identifierType);
+        patientIdentifier.setIdentifierType(patientIdentifierType);
+        return patientIdentifier;
     }
 
     private List<String> getRequiredFields(Patient patient){
