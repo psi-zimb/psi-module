@@ -17,6 +17,7 @@ import org.powermock.modules.junit4.PowerMockRunner;
 import java.text.SimpleDateFormat;
 
 import static junit.framework.Assert.assertEquals;
+import static org.openmrs.PatientIdentifierType.LocationBehavior.NOT_USED;
 import static org.powermock.api.mockito.PowerMockito.doNothing;
 import static org.powermock.api.mockito.PowerMockito.when;
 import static org.powermock.api.mockito.PowerMockito.whenNew;
@@ -484,6 +485,7 @@ public class PatientUICIdentifierTest {
         when(patientIdentifierService.getIdentifierTypeId("UIC")).thenReturn(1);
         whenNew(PatientIdentifierType.class).withArguments(1).thenReturn(patientIdentifierType);
         doNothing().when(patientIdentifierType).setName("UIC");
+        doNothing().when(patientIdentifierType).setLocationBehavior(NOT_USED);
 
 
         patientUICIdentifier.updateUICIdentifier(patient);

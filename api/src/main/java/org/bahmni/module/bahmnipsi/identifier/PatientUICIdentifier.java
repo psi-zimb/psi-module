@@ -13,6 +13,8 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
+import static org.openmrs.PatientIdentifierType.LocationBehavior.NOT_USED;
+
 public class PatientUICIdentifier {
 
     private String identifierType = "UIC";
@@ -45,6 +47,7 @@ public class PatientUICIdentifier {
         int identifierTypeId = Context.getService(PatientIdentifierService.class).getIdentifierTypeId(identifierType);
         PatientIdentifierType patientIdentifierType = new PatientIdentifierType(identifierTypeId);
         patientIdentifierType.setName(identifierType);
+        patientIdentifierType.setLocationBehavior(NOT_USED);
         patientIdentifier.setIdentifierType(patientIdentifierType);
         return patientIdentifier;
     }
