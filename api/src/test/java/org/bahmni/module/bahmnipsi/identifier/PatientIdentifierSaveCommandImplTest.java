@@ -55,21 +55,21 @@ public class PatientIdentifierSaveCommandImplTest {
     @Test
     public void shouldCallUpdateOiPrepIdentifierWithAffixAWhenServiceIsInitialArt() throws Exception {
         patientIdentifierSaveCommandImpl.setPatientOiPrepIdentifier(patientOiPrepIdentifier);
-        doNothing().when(patientOiPrepIdentifier).updateOiPrepIdentifier(patientUuid, "A");
+        doNothing().when(patientOiPrepIdentifier).updateOiPrepIdentifier(patientUuid, "A", "INIT_ART_SERVICE");
         BahmniEncounterTransaction bahmniEncounterTransaction = PatientTestData.setUpEncounterTransactionDataWith(initialArtService,conceptName, patientUuid);
         patientIdentifierSaveCommandImpl.update(bahmniEncounterTransaction);
 
-        verify(patientOiPrepIdentifier, times(1)).updateOiPrepIdentifier(patientUuid, "A");
+        verify(patientOiPrepIdentifier, times(1)).updateOiPrepIdentifier(patientUuid, "A", "INIT_ART_SERVICE");
     }
 
     @Test
     public void shouldCallUpdateOiPrepIdentifierWithAffixPWhenServiceIsPrepInitial() throws Exception {
         patientIdentifierSaveCommandImpl.setPatientOiPrepIdentifier(patientOiPrepIdentifier);
-        doNothing().when(patientOiPrepIdentifier).updateOiPrepIdentifier(patientUuid, "P");
+        doNothing().when(patientOiPrepIdentifier).updateOiPrepIdentifier(patientUuid, "P", "PrEP_INIT");
         BahmniEncounterTransaction bahmniEncounterTransaction = PatientTestData.setUpEncounterTransactionDataWith(prepInitial, conceptName, patientUuid);
         patientIdentifierSaveCommandImpl.update(bahmniEncounterTransaction);
 
-        verify(patientOiPrepIdentifier, times(1)).updateOiPrepIdentifier(patientUuid, "P");
+        verify(patientOiPrepIdentifier, times(1)).updateOiPrepIdentifier(patientUuid, "P", "PrEP_INIT");
     }
 
     @Test
@@ -77,11 +77,11 @@ public class PatientIdentifierSaveCommandImplTest {
         patientIdentifierSaveCommandImpl.setPatientOiPrepIdentifier(patientOiPrepIdentifier);
         exception.expect(RuntimeException.class);
 
-        doThrow(RuntimeException.class).when(patientOiPrepIdentifier).updateOiPrepIdentifier(patientUuid, "A");
+        doThrow(RuntimeException.class).when(patientOiPrepIdentifier).updateOiPrepIdentifier(patientUuid, "A", "INIT_ART_SERVICE");
         BahmniEncounterTransaction bahmniEncounterTransaction = PatientTestData.setUpEncounterTransactionDataWith(initialArtService, conceptName, patientUuid);
         patientIdentifierSaveCommandImpl.update(bahmniEncounterTransaction);
 
-        verify(patientOiPrepIdentifier, times(1)).updateOiPrepIdentifier(patientUuid, "A");
+        verify(patientOiPrepIdentifier, times(1)).updateOiPrepIdentifier(patientUuid, "A", "INIT_ART_SERVICE");
     }
 
     @Test
@@ -89,11 +89,11 @@ public class PatientIdentifierSaveCommandImplTest {
         patientIdentifierSaveCommandImpl.setPatientOiPrepIdentifier(patientOiPrepIdentifier);
         exception.expect(RuntimeException.class);
 
-        doThrow(RuntimeException.class).when(patientOiPrepIdentifier).updateOiPrepIdentifier(patientUuid, "P");
+        doThrow(RuntimeException.class).when(patientOiPrepIdentifier).updateOiPrepIdentifier(patientUuid, "P", "PrEP_INIT");
         BahmniEncounterTransaction bahmniEncounterTransaction = PatientTestData.setUpEncounterTransactionDataWith(prepInitial, conceptName, patientUuid);
         patientIdentifierSaveCommandImpl.update(bahmniEncounterTransaction);
 
-        verify(patientOiPrepIdentifier, times(1)).updateOiPrepIdentifier(patientUuid, "P");
+        verify(patientOiPrepIdentifier, times(1)).updateOiPrepIdentifier(patientUuid, "P", "PrEP_INIT");
     }
 
     @Test
@@ -137,8 +137,8 @@ public class PatientIdentifierSaveCommandImplTest {
 
         patientIdentifierSaveCommandImpl.update(bahmniEncounterTransaction);
 
-        verify(patientOiPrepIdentifier, times(0)).updateOiPrepIdentifier(patientUuid, "A");
-        verify(patientOiPrepIdentifier, times(0)).updateOiPrepIdentifier(patientUuid, "P");
+        verify(patientOiPrepIdentifier, times(0)).updateOiPrepIdentifier(patientUuid, "A", "INIT_ART_SERVICE");
+        verify(patientOiPrepIdentifier, times(0)).updateOiPrepIdentifier(patientUuid, "P", "INIT_ART_SERVICE");
     }
 
     @Test
@@ -147,8 +147,8 @@ public class PatientIdentifierSaveCommandImplTest {
 
         patientIdentifierSaveCommandImpl.update(bahmniEncounterTransaction);
 
-        verify(patientOiPrepIdentifier, times(0)).updateOiPrepIdentifier(patientUuid, "A");
-        verify(patientOiPrepIdentifier, times(0)).updateOiPrepIdentifier(patientUuid, "P");
+        verify(patientOiPrepIdentifier, times(0)).updateOiPrepIdentifier(patientUuid, "A", "INIT_ART_SERVICE");
+        verify(patientOiPrepIdentifier, times(0)).updateOiPrepIdentifier(patientUuid, "P", "INIT_ART_SERVICE");
 
     }
 }
