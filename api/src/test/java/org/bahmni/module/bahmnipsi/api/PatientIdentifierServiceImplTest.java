@@ -26,11 +26,11 @@ public class PatientIdentifierServiceImplTest {
     public void shouldGetNextValue() {
         int expectedOutput = 2;
 
-        when(patientIdentifierDAO.getNextSeqValue()).thenReturn(2);
+        when(patientIdentifierDAO.getNextSeqValue("INIT_ART_SERVICE")).thenReturn(2);
 
-        int actualOutput = impl.getNextSeqValue();
+        int actualOutput = impl.getNextSeqValue("INIT_ART_SERVICE");
 
-        verify(patientIdentifierDAO, times(1)).getNextSeqValue();
+        verify(patientIdentifierDAO, times(1)).getNextSeqValue("INIT_ART_SERVICE");
         Assert.assertEquals(expectedOutput, actualOutput);
     }
 
@@ -50,10 +50,10 @@ public class PatientIdentifierServiceImplTest {
     @Test
     public void shouldCallDAOIncrementMethod() {
         int seqValue = 2;
-        doNothing().when(patientIdentifierDAO).incrementSeqValueByOne(seqValue);
+        doNothing().when(patientIdentifierDAO).incrementSeqValueByOne(seqValue, "INIT_ART_SERVICE");
 
-        impl.incrementSeqValueByOne(seqValue);
-        verify(patientIdentifierDAO, times(1)).incrementSeqValueByOne(seqValue);
+        impl.incrementSeqValueByOne(seqValue, "INIT_ART_SERVICE");
+        verify(patientIdentifierDAO, times(1)).incrementSeqValueByOne(seqValue, "INIT_ART_SERVICE");
     }
 
 }

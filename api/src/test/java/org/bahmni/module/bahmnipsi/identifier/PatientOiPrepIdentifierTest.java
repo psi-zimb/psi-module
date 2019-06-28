@@ -73,7 +73,7 @@ public class PatientOiPrepIdentifierTest {
         exception.expect(RuntimeException.class);
         exception.expectMessage("Province should not be empty on the Registration first page to generate Prep/Oi Identifier.");
 
-        patientOiPrepIdentifier.updateOiPrepIdentifier(patientUuid, affix);
+        patientOiPrepIdentifier.updateOiPrepIdentifier(patientUuid, affix, "INIT_ART_SERVICE");
     }
 
     @Test
@@ -86,7 +86,7 @@ public class PatientOiPrepIdentifierTest {
         exception.expect(RuntimeException.class);
         exception.expectMessage("District should not be empty on the Registration first page to generate Prep/Oi Identifier.");
 
-        patientOiPrepIdentifier.updateOiPrepIdentifier(patientUuid, affix);
+        patientOiPrepIdentifier.updateOiPrepIdentifier(patientUuid, affix, "INIT_ART_SERVICE");
     }
 
     @Test
@@ -101,7 +101,7 @@ public class PatientOiPrepIdentifierTest {
         exception.expect(RuntimeException.class);
         exception.expectMessage("Facility should not be empty on the Registration first page to generate Prep/Oi Identifier.");
 
-        patientOiPrepIdentifier.updateOiPrepIdentifier(patientUuid, affix);
+        patientOiPrepIdentifier.updateOiPrepIdentifier(patientUuid, affix, "INIT_ART_SERVICE");
     }
 
     @Test
@@ -116,7 +116,7 @@ public class PatientOiPrepIdentifierTest {
         exception.expect(RuntimeException.class);
         exception.expectMessage("Province, District should not be empty on the Registration first page to generate Prep/Oi Identifier.");
 
-        patientOiPrepIdentifier.updateOiPrepIdentifier(patientUuid, affix);
+        patientOiPrepIdentifier.updateOiPrepIdentifier(patientUuid, affix, "INIT_ART_SERVICE");
     }
 
     @Test
@@ -131,7 +131,7 @@ public class PatientOiPrepIdentifierTest {
         exception.expect(RuntimeException.class);
         exception.expectMessage("Province, Facility should not be empty on the Registration first page to generate Prep/Oi Identifier.");
 
-        patientOiPrepIdentifier.updateOiPrepIdentifier(patientUuid, affix);
+        patientOiPrepIdentifier.updateOiPrepIdentifier(patientUuid, affix, "INIT_ART_SERVICE");
     }
 
     @Test
@@ -146,7 +146,7 @@ public class PatientOiPrepIdentifierTest {
         exception.expect(RuntimeException.class);
         exception.expectMessage("District, Facility should not be empty on the Registration first page to generate Prep/Oi Identifier.");
 
-        patientOiPrepIdentifier.updateOiPrepIdentifier(patientUuid, affix);
+        patientOiPrepIdentifier.updateOiPrepIdentifier(patientUuid, affix, "INIT_ART_SERVICE");
     }
 
     @Test
@@ -162,7 +162,7 @@ public class PatientOiPrepIdentifierTest {
             exception.expect(RuntimeException.class);
             exception.expectMessage("Province, District, Facility should not be empty on the Registration first page to generate Prep/Oi Identifier.");
 
-            patientOiPrepIdentifier.updateOiPrepIdentifier(patientUuid, affix);
+            patientOiPrepIdentifier.updateOiPrepIdentifier(patientUuid, affix, "INIT_ART_SERVICE");
         }
 
     @Test
@@ -177,7 +177,7 @@ public class PatientOiPrepIdentifierTest {
         exception.expect(RuntimeException.class);
         exception.expectMessage("Please enter the Province code in the square brackets example 'MIDLANDS[07]' and code length must be 2");
 
-        patientOiPrepIdentifier.updateOiPrepIdentifier(patientUuid, affix);
+        patientOiPrepIdentifier.updateOiPrepIdentifier(patientUuid, affix, "INIT_ART_SERVICE");
     }
 
     @Test
@@ -192,7 +192,7 @@ public class PatientOiPrepIdentifierTest {
         exception.expect(RuntimeException.class);
         exception.expectMessage("Please enter the District code in the square brackets example 'MIDLANDS[07]' and code length must be 2");
 
-        patientOiPrepIdentifier.updateOiPrepIdentifier(patientUuid, affix);
+        patientOiPrepIdentifier.updateOiPrepIdentifier(patientUuid, affix, "INIT_ART_SERVICE");
     }
 
     @Test
@@ -207,7 +207,7 @@ public class PatientOiPrepIdentifierTest {
         exception.expect(RuntimeException.class);
         exception.expectMessage("Please enter the Facility code in the square brackets example 'MIDLANDS[07]' and code length must be 2");
 
-        patientOiPrepIdentifier.updateOiPrepIdentifier(patientUuid, affix);
+        patientOiPrepIdentifier.updateOiPrepIdentifier(patientUuid, affix, "INIT_ART_SERVICE");
     }
 
     @Test
@@ -223,7 +223,7 @@ public class PatientOiPrepIdentifierTest {
         exception.expect(RuntimeException.class);
         exception.expectMessage("Please enter the Province, District code in the square brackets example 'MIDLANDS[07]' and code length must be 2");
 
-        patientOiPrepIdentifier.updateOiPrepIdentifier(patientUuid, affix);
+        patientOiPrepIdentifier.updateOiPrepIdentifier(patientUuid, affix,"INIT_ART_SERVICE" );
     }
 
     @Test
@@ -239,7 +239,7 @@ public class PatientOiPrepIdentifierTest {
         exception.expect(RuntimeException.class);
         exception.expectMessage("Please enter the Province, Facility code in the square brackets example 'MIDLANDS[07]' and code length must be 2");
 
-        patientOiPrepIdentifier.updateOiPrepIdentifier(patientUuid, affix);
+        patientOiPrepIdentifier.updateOiPrepIdentifier(patientUuid, affix, "INIT_ART_SERVICE");
     }
 
     @Test
@@ -255,7 +255,7 @@ public class PatientOiPrepIdentifierTest {
         exception.expect(RuntimeException.class);
         exception.expectMessage("Please enter the District, Facility code in the square brackets example 'MIDLANDS[07]' and code length must be 2");
 
-        patientOiPrepIdentifier.updateOiPrepIdentifier(patientUuid, affix);
+        patientOiPrepIdentifier.updateOiPrepIdentifier(patientUuid, affix, "INIT_ART_SERVICE");
     }
 
     @Test
@@ -272,7 +272,7 @@ public class PatientOiPrepIdentifierTest {
         exception.expect(RuntimeException.class);
         exception.expectMessage("Please enter the Province, District, Facility code in the square brackets example 'MIDLANDS[07]' and code length must be 2");
 
-        patientOiPrepIdentifier.updateOiPrepIdentifier(patientUuid, affix);
+        patientOiPrepIdentifier.updateOiPrepIdentifier(patientUuid, affix, "INIT_ART_SERVICE");
     }
 
     @Test
@@ -288,7 +288,7 @@ public class PatientOiPrepIdentifierTest {
         exception.expect(RuntimeException.class);
         exception.expectMessage("Province code length must be 2");
 
-        patientOiPrepIdentifier.updateOiPrepIdentifier(patientUuid, affix);
+        patientOiPrepIdentifier.updateOiPrepIdentifier(patientUuid, affix, "INIT_ART_SERVICE");
     }
 
     @Test
@@ -304,7 +304,7 @@ public class PatientOiPrepIdentifierTest {
         exception.expect(RuntimeException.class);
         exception.expectMessage("District code length must be 2");
 
-        patientOiPrepIdentifier.updateOiPrepIdentifier(patientUuid, affix);
+        patientOiPrepIdentifier.updateOiPrepIdentifier(patientUuid, affix, "INIT_ART_SERVICE");
     }
 
     @Test
@@ -320,7 +320,7 @@ public class PatientOiPrepIdentifierTest {
         exception.expect(RuntimeException.class);
         exception.expectMessage("Facility code length must be 2");
 
-        patientOiPrepIdentifier.updateOiPrepIdentifier(patientUuid, affix);
+        patientOiPrepIdentifier.updateOiPrepIdentifier(patientUuid, affix, "INIT_ART_SERVICE");
     }
 
     @Test
@@ -338,7 +338,7 @@ public class PatientOiPrepIdentifierTest {
         exception.expect(RuntimeException.class);
         exception.expectMessage("Province, District code length must be 2");
 
-        patientOiPrepIdentifier.updateOiPrepIdentifier(patientUuid, affix);
+        patientOiPrepIdentifier.updateOiPrepIdentifier(patientUuid, affix, "INIT_ART_SERVICE");
     }
 
     @Test
@@ -356,7 +356,7 @@ public class PatientOiPrepIdentifierTest {
         exception.expect(RuntimeException.class);
         exception.expectMessage("Province, Facility code length must be 2");
 
-        patientOiPrepIdentifier.updateOiPrepIdentifier(patientUuid, affix);
+        patientOiPrepIdentifier.updateOiPrepIdentifier(patientUuid, affix, "INIT_ART_SERVICE");
     }
 
     @Test
@@ -373,7 +373,7 @@ public class PatientOiPrepIdentifierTest {
         exception.expect(RuntimeException.class);
         exception.expectMessage("District, Facility code length must be 2");
 
-        patientOiPrepIdentifier.updateOiPrepIdentifier(patientUuid, affix);
+        patientOiPrepIdentifier.updateOiPrepIdentifier(patientUuid, affix, "INIT_ART_SERVICE");
     }
 
     @Test
@@ -392,7 +392,7 @@ public class PatientOiPrepIdentifierTest {
         exception.expect(RuntimeException.class);
         exception.expectMessage("Province, District, Facility code length must be 2");
 
-        patientOiPrepIdentifier.updateOiPrepIdentifier(patientUuid, affix);
+        patientOiPrepIdentifier.updateOiPrepIdentifier(patientUuid, affix, "INIT_ART_SERVICE");
     }
 
     @Test
@@ -404,12 +404,12 @@ public class PatientOiPrepIdentifierTest {
         setUpMocks(patient);
         when(personAddress.getStateProvince()).thenReturn(province);
         when(StringUtils.substringBetween(province, "[", "]")).thenReturn("0D");
-        doThrow(RuntimeException.class).when(patientIdentifierService).getNextSeqValue();
+        doThrow(RuntimeException.class).when(patientIdentifierService).getNextSeqValue("INIT_ART_SERVICE");
 
         exception.expect(RuntimeException.class);
         exception.expectMessage("Could not able to get next Sequence Value of the Prep/Oi Identifier");
 
-        patientOiPrepIdentifier.updateOiPrepIdentifier(patientUuid, affix);
+        patientOiPrepIdentifier.updateOiPrepIdentifier(patientUuid, affix, "INIT_ART_SERVICE");
     }
 
     @Test
@@ -424,12 +424,12 @@ public class PatientOiPrepIdentifierTest {
         setUpMocks(patient);
         when(personAddress.getStateProvince()).thenReturn(province);
         when(StringUtils.substringBetween(province, "[", "]")).thenReturn("0D");
-        when(patientIdentifierService.getNextSeqValue()).thenReturn(nextSeqValue);
+        when(patientIdentifierService.getNextSeqValue("INIT_ART_SERVICE")).thenReturn(nextSeqValue);
         when(String.format("%05d", nextSeqValue)).thenReturn(suffix);
         doNothing().when(patientIdentifier).setIdentifier(identifier);
-        doNothing().when(patientIdentifierService).incrementSeqValueByOne(nextSeqValue + 1);
+        doNothing().when(patientIdentifierService).incrementSeqValueByOne(nextSeqValue + 1, "INIT_ART_SERVICE");
 
-        patientOiPrepIdentifier.updateOiPrepIdentifier(patientUuid, affix);
+        patientOiPrepIdentifier.updateOiPrepIdentifier(patientUuid, affix, "INIT_ART_SERVICE");
 
         verifyStatic(VerificationModeFactory.times(2));
         Context.getPatientService();
@@ -448,11 +448,11 @@ public class PatientOiPrepIdentifierTest {
         verify(personAddress, times(1)).getStateProvince();
         verify(personAddress, times(1)).getCityVillage();
         verify(personAddress, times(1)).getAddress2();
-        verify(patientIdentifierService, times(1)).getNextSeqValue();
+        verify(patientIdentifierService, times(1)).getNextSeqValue("INIT_ART_SERVICE");
         verify(patientIdentifierService, times(1)).getIdentifierTypeId(identifierType);
         verify(patientIdentifier, times(1)).setIdentifierType(patientIdentifierType);
         verify(patientIdentifier, times(1)).setIdentifier(identifier);
-        verify(patientIdentifierService, times(1)).incrementSeqValueByOne(nextSeqValue);
+        verify(patientIdentifierService, times(1)).incrementSeqValueByOne(nextSeqValue, "INIT_ART_SERVICE");
     }
 
     @Test
@@ -463,7 +463,7 @@ public class PatientOiPrepIdentifierTest {
         exception.expect(RuntimeException.class);
         exception.expectMessage("Can not change visit type from Initial Art Service to Prep Initial");
 
-        patientOiPrepIdentifier.updateOiPrepIdentifier(patientUuid, "P");
+        patientOiPrepIdentifier.updateOiPrepIdentifier(patientUuid, "P", "INIT_ART_SERVICE");
 
         verifyStatic(VerificationModeFactory.times(1));
         Context.getPatientService();
@@ -477,7 +477,7 @@ public class PatientOiPrepIdentifierTest {
         patient = PatientTestData.setOiPrepIdentifierToPatient(identifier);
         setUpMocks(patient);
 
-        patientOiPrepIdentifier.updateOiPrepIdentifier(patientUuid, "A");
+        patientOiPrepIdentifier.updateOiPrepIdentifier(patientUuid, "A", "INIT_ART_SERVICE");
 
         Assert.assertEquals("00-OA-63-2017-A-01368", patient.getPatientIdentifier(identifierType).getIdentifier());
     }

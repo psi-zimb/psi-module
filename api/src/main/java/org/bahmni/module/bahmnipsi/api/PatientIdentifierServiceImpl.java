@@ -9,8 +9,8 @@ public class PatientIdentifierServiceImpl implements PatientIdentifierService {
     }
 
     @Override
-    public int getNextSeqValue() {
-        return patientIdentifierDAO.getNextSeqValue();
+    public int getNextSeqValue(String sequenceType) {
+        return patientIdentifierDAO.getNextSeqValue(sequenceType);
     }
 
     @Override
@@ -19,7 +19,7 @@ public class PatientIdentifierServiceImpl implements PatientIdentifierService {
     }
 
     @Override
-    public void incrementSeqValueByOne(int seqValue) {
-        patientIdentifierDAO.incrementSeqValueByOne(seqValue);
+    public void incrementSeqValueByOne(int seqValue, String sequenceType) {
+        patientIdentifierDAO.incrementSeqValueByOne(seqValue, sequenceType);
     }
 }
