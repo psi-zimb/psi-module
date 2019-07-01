@@ -3,11 +3,9 @@ package org.bahmni.module.bahmnipsi.identifier;
 public class PrepOiCounter {
     int id;
     int nextSeqValue;
-    String seqType;
 
-    public PrepOiCounter(int id, String seqType, int nextSeqValue) {
+    public PrepOiCounter(int id, int nextSeqValue) {
         this.id = id;
-        this.seqType = seqType;
         this.nextSeqValue = nextSeqValue;
     }
 
@@ -17,14 +15,6 @@ public class PrepOiCounter {
 
     public void setId(int id) {
         this.id = id;
-    }
-
-    public String getSeqType() {
-        return seqType;
-    }
-
-    public void setSeqType(String seqType) {
-        this.seqType = seqType;
     }
 
     public int getNextSeqValue() {

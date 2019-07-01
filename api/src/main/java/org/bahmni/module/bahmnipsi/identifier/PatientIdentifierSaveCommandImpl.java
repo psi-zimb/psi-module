@@ -13,12 +13,11 @@ import java.util.LinkedHashMap;
 
 @Component
 public class PatientIdentifierSaveCommandImpl implements EncounterDataPreSaveCommand {
-    private static final int TWO = 2;
     private final String reasonForVisit = "Reason for visit";
     private final String initialArt = "Initial ART service";
     private final String prepInitial = "PrEP Initial";
-    private final String INIT_ART_SEQ_TYPE = "INIT_ART_SERVICE";
-    private final String PREP_INIT_SEQ_TYPE = "PrEP_INIT";
+    private static final int TWO = 2;
+
     private PatientOiPrepIdentifier patientOiPrepIdentifier;
 
     @Autowired
@@ -33,16 +32,16 @@ public class PatientIdentifierSaveCommandImpl implements EncounterDataPreSaveCom
 
         String requiredObs = checkForArtPrepServiceObs(groupMembers);
 
-        if (!requiredObs.isEmpty()) {
+        if(!requiredObs.isEmpty()) {
             if (requiredObs.equalsIgnoreCase(initialArt)) {
                 try {
-                    patientOiPrepIdentifier.updateOiPrepIdentifier(patientUuid, "A", INIT_ART_SEQ_TYPE);
+                    patientOiPrepIdentifier.updateOiPrepIdentifier(patientUuid, "A");
                 } catch (Exception e) {
                     throw new RuntimeException(e.getMessage());
                 }
             } else if (requiredObs.equalsIgnoreCase(prepInitial)) {
                 try {
-                    patientOiPrepIdentifier.updateOiPrepIdentifier(patientUuid, "P", PREP_INIT_SEQ_TYPE);
+                    patientOiPrepIdentifier.updateOiPrepIdentifier(patientUuid, "P");
                 } catch (Exception e) {
                     throw new RuntimeException(e.getMessage());
                 }
@@ -59,11 +58,11 @@ public class PatientIdentifierSaveCommandImpl implements EncounterDataPreSaveCom
             if (value != null && value.get("name").equals(initialArt)) {
                 artPrepServiceCount++;
                 requiredObs = initialArt;
-            } else if (value != null && value.get("name").equals(prepInitial)) {
+            } else if(value != null && value.get("name").equals(prepInitial)) {
                 artPrepServiceCount++;
                 requiredObs = prepInitial;
             }
-            if (artPrepServiceCount == TWO) {
+            if(artPrepServiceCount == TWO) {
                 throw new RuntimeException("Both Initial Art Service and Prep Initial can not be selected at time. Please unselect one");
             }
         }
