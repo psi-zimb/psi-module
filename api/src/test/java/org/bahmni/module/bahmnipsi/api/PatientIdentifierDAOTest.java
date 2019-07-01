@@ -9,7 +9,12 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
+import org.openmrs.PatientIdentifier;
 import org.powermock.modules.junit4.PowerMockRunner;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 import static org.mockito.Mockito.*;
 
@@ -29,7 +34,6 @@ public class PatientIdentifierDAOTest {
 
     private PatientIdentifierDAO patientIdentifierDAO;
     private String identifier, regex;
-    private String initArtService = "INIT_ART_SERVICE";;
 
     @Before
     public void setUp() {
@@ -41,50 +45,19 @@ public class PatientIdentifierDAOTest {
 
     @Test
     public void shouldGetNextSeqValue() {
-        String sql = "select next_seq_value from prep_oi_counter where seq_type = :sequenceType";
+        String sql = "select next_seq_value from prep_oi_counter";
         Integer nextVal = new Integer(3);
 
         when(sessionFactory.getCurrentSession()).thenReturn(session);
         when(session.createSQLQuery(sql)).thenReturn(sqlQuery);
-        when(sqlQuery.setParameter("sequenceType", initArtService)).thenReturn(sqlQuery);
         when(sqlQuery.uniqueResult()).thenReturn(nextVal);
 
-        int expectedVal = patientIdentifierDAO.getNextSeqValue(initArtService);
+        int expectedVal = patientIdentifierDAO.getNextSeqValue();
 
         verify(sessionFactory, times(1)).getCurrentSession();
         verify(session, times(1)).createSQLQuery(sql);
-        verify(sqlQuery, times(1)).setParameter("sequenceType", initArtService);
         verify(sqlQuery, times(1)).uniqueResult();
         Assert.assertEquals(3, expectedVal);
-    }
-
-    @Test
-    public void shouldInitializeSequenceIfNotPresent() {
-        String sql = "select next_seq_value from prep_oi_counter where seq_type = :sequenceType";
-        when(sessionFactory.getCurrentSession()).thenReturn(session);
-        when(session.createSQLQuery(sql)).thenReturn(sqlQuery);
-        when(sqlQuery.setParameter("sequenceType", initArtService)).thenReturn(sqlQuery);
-        when(sqlQuery.uniqueResult()).thenReturn(null);
-
-        String insertSql = "insert into prep_oi_counter(seq_type, next_seq_value) values(:sequenceType, :nextSeqValue)";
-        when(session.createSQLQuery(insertSql)).thenReturn(sqlQuery);
-        when(sqlQuery.setParameter("sequenceType", initArtService)).thenReturn(sqlQuery);
-        when(sqlQuery.setParameter("nextSeqValue", new Integer(0))).thenReturn(sqlQuery);
-        when(sqlQuery.executeUpdate()).thenReturn(1);
-
-        int expectedVal = patientIdentifierDAO.getNextSeqValue(initArtService);
-
-        verify(sessionFactory, times(2)).getCurrentSession();
-        verify(session, times(1)).createSQLQuery(sql);
-        verify(session, times(1)).createSQLQuery(insertSql);
-
-
-        verify(sqlQuery, times(2)).setParameter("sequenceType", initArtService);
-        verify(sqlQuery, times(1)).setParameter("nextSeqValue", new Integer(0));
-        verify(sqlQuery, times(1)).executeUpdate();
-
-
-        Assert.assertEquals(0, expectedVal);
     }
 
     @Test
@@ -108,22 +81,20 @@ public class PatientIdentifierDAOTest {
 
     @Test
     public void shouldIncrementValueByOne() {
-        String sql = "update prep_oi_counter set next_seq_value = :nextValue where seq_type = :sequenceType";
+        String sql = "update prep_oi_counter set next_seq_value = :nextValue";
         int currentValue = 4;
         int nextVal = 5;
 
         when(sessionFactory.getCurrentSession()).thenReturn(session);
         when(session.createSQLQuery(sql)).thenReturn(sqlQuery);
         when(sqlQuery.setParameter("nextValue", nextVal)).thenReturn(query);
-        when(query.setParameter("sequenceType", initArtService)).thenReturn(query);
         when(query.executeUpdate()).thenReturn(nextVal);
 
-        patientIdentifierDAO.incrementSeqValueByOne(currentValue, initArtService);
+        patientIdentifierDAO.incrementSeqValueByOne(currentValue);
 
         verify(sessionFactory, times(1)).getCurrentSession();
         verify(session, times(1)).createSQLQuery(sql);
         verify(sqlQuery, times(1)).setParameter("nextValue", nextVal);
-        verify(query, times(1)).setParameter("sequenceType", initArtService);
         verify(query, times(1)).executeUpdate();
     }
 }

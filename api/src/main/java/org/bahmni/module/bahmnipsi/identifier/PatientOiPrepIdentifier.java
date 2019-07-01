@@ -18,11 +18,11 @@ public class PatientOiPrepIdentifier {
     private final int affixIndex = 14;
     private final int codesLength = 2;
 
-    public void updateOiPrepIdentifier(String patientUuid, String affix, String sequenceType) throws Exception {
+    public void updateOiPrepIdentifier(String patientUuid, String affix) throws Exception {
         PatientIdentifier patientIdentifier = getPatientIdentifier(patientUuid);
 
         if(patientIdentifier == null) {
-            updateIdentifierByUsing(patientUuid, affix, sequenceType);
+            updateIdentifierByUsing(patientUuid, affix);
         }  else {
             String oiPrepIdentifier = patientIdentifier.getIdentifier();
             char existedAffix = oiPrepIdentifier.charAt(affixIndex);
@@ -34,14 +34,14 @@ public class PatientOiPrepIdentifier {
         }
     }
 
-    private void updateIdentifierByUsing(String patientUuid, String affix, String sequenceType) throws Exception {
+    private void updateIdentifierByUsing(String patientUuid, String affix) throws Exception {
         List<String> requiredFields = getRequiredFields(patientUuid);
-        int nextSeqValue = getNextSeqValue(sequenceType);
+        int nextSeqValue = getNextSeqValue();
         String seqValueWithFiveChars = String.format("%0"+ oiPrepIdentifierSuffixLength +"d", nextSeqValue);
         PatientIdentifier patientIdentifier = createIdentifier();
         addIdentifier(patientUuid, patientIdentifier);
         setIdentifier(patientIdentifier, requiredFields, affix, seqValueWithFiveChars);
-        incrementNextSeqValueByOne(nextSeqValue, sequenceType);
+        incrementNextSeqValueByOne(nextSeqValue);
     }
 
     private List<String> getRequiredFields(String patientUuid) {
@@ -106,9 +106,9 @@ public class PatientOiPrepIdentifier {
         return StringUtils.substringBetween(region, "[", "]");
     }
 
-    private int getNextSeqValue(String sequenceType) throws Exception {
+    private int getNextSeqValue() throws Exception {
         try {
-            return Context.getService(PatientIdentifierService.class).getNextSeqValue(sequenceType);
+            return Context.getService(PatientIdentifierService.class).getNextSeqValue();
         } catch (Exception e) {
             throw new RuntimeException("Could not able to get next Sequence Value of the Prep/Oi Identifier");
         }
@@ -118,8 +118,8 @@ public class PatientOiPrepIdentifier {
         patientIdentifier.setIdentifier(requiredFields.get(0)+"-"+requiredFields.get(1)+"-"+requiredFields.get(2)+"-"+requiredFields.get(3)+"-"+affix+"-"+nextSeqValue);
     }
 
-    private void incrementNextSeqValueByOne(int currentSeqValue, String sequenceType) {
-        Context.getService(PatientIdentifierService.class).incrementSeqValueByOne(currentSeqValue, sequenceType);
+    private void incrementNextSeqValueByOne(int currentSeqValue) {
+        Context.getService(PatientIdentifierService.class).incrementSeqValueByOne(currentSeqValue);
     }
 
     private PatientIdentifier getPatientIdentifier(String patientUuid) {
