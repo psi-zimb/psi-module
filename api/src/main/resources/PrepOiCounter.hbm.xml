@@ -7,7 +7,7 @@
         <id name="id" type="int" column="id" unsaved-value="0">
             <generator class="native"/>
         </id>
-
         <property name="nextSeqValue" type="int" column="next_seq_value" not-null="true" />
+        <property name="seqType" type="string" column="seq_type" not-null="true" />
     </class>
 </hibernate-mapping>

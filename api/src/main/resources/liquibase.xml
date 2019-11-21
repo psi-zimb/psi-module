@@ -1,8 +1,35 @@
 <?xml version="1.0" encoding="UTF-8"?>
- 
+
 <databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9
                   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+
+    <changeSet id="psi-zimb-20191121" author="SivaReddy" context="psi_omod">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="prep_oi_counter"/>
+            </not>
+        </preConditions>
+        <comment>Creating table prep_oi_counter</comment>
+        <createTable tableName="prep_oi_counter">
+            <column name="id" type="int" autoIncrement="true">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="next_seq_value" type="int" defaultValue="0"/>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="psi-zimb-20191122" author="SivaReddy" context="psi_omod">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists columnName="seq_type" tableName="prep_oi_counter"/>
+            </not>
+        </preConditions>
+        <comment>Add column seq_type to table prep_oi_counter</comment>
+        <addColumn tableName="prep_oi_counter">
+            <column name="seq_type" type="varchar(255)"/>
+        </addColumn>
+    </changeSet>
 
 </databaseChangeLog>
