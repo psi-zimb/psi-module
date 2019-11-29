@@ -11,7 +11,8 @@ import java.lang.reflect.Method;
 public class BeforePatientSave implements MethodBeforeAdvice {
 
     private static final String methodToIntercept = "savePatient";
-    private final String regex = "\\w{2}-\\w{2}-\\w{2}-\\d{4}-[AP]{1}-\\d{5}";
+    private final String regexP = "\\w{2}-\\w{2}-\\w{2}-\\d{4}-[P]{1}-\\d{5}";
+    private final String regexPR = "\\w{2}-\\w{2}-\\w{2}-\\d{4}-(A|PR){1}-\\d{5}";
     private String identifierType = "PREP/OI Identifier";
 
     @Override
@@ -23,9 +24,17 @@ public class BeforePatientSave implements MethodBeforeAdvice {
                 patientUICIdentifier.updateUICIdentifier(patient);
 
                 PatientIdentifier patientIdentifier = patient.getPatientIdentifier(identifierType);
-                if(patientIdentifier != null && !"".equals(patientIdentifier)) {
+
+                if(patientIdentifier != null && !"".equals(patientIdentifier.getIdentifier())) {
                     String prepOiIdentifier = patientIdentifier.getIdentifier();
-                    if (!prepOiIdentifier.matches(regex)) {
+                    if (prepOiIdentifier.matches(regexP)) {
+                        int year = Integer.parseInt(prepOiIdentifier.split("-")[3]);
+                        int lastSeq = Context.getService(PatientIdentifierService.class).getLastSeqValue();
+                        String sequenceIdEntered = prepOiIdentifier.split("-")[5];
+                        int sequenceId = Integer.parseInt(sequenceIdEntered);
+                        if(year >= 2019 && sequenceId > lastSeq)
+                            throw new RuntimeException("Given Prep/Oi Identifier is not matching with the Expected Pattern");
+                    } else if (!prepOiIdentifier.matches(regexPR)) {
                         throw new RuntimeException("Given Prep/Oi Identifier is not matching with the Expected Pattern");
                     } else {
                         String sequenceTypeEntered = prepOiIdentifier.split("-")[4];
@@ -36,7 +45,7 @@ public class BeforePatientSave implements MethodBeforeAdvice {
                             sequenceType = "INIT_ART_SERVICE";
                             sequence = "Initial ART";
                         }
-                        else if("P".equals(sequenceTypeEntered)) {
+                        else if("PR".equals(sequenceTypeEntered)) {
                             sequenceType = "PrEP_INIT";
                             sequence = "PrEP";
                         }

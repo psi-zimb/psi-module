@@ -141,9 +141,18 @@ public class PatientOiPrepIdentifier {
         patient.addIdentifier(patientIdentifier);
     }
 
-    private void changeAffixPToA(PatientIdentifier patientIdentifier, String oiPrepIdentifier) {
-        StringBuffer newIdentifier = new StringBuffer(oiPrepIdentifier);
-        newIdentifier.setCharAt(affixIndex, 'A');
+    private void changeAffixPToA(PatientIdentifier patientIdentifier, String oiPrepIdentifier) throws Exception{
+        StringBuffer newIdentifier = new StringBuffer();
+        int year = Year.now().getValue();
+        int nextSeqValue = getNextSeqValue("INIT_ART_SERVICE");
+        String seqValueWithFiveChars = String.format("%0"+ oiPrepIdentifierSuffixLength +"d", nextSeqValue);
+
+        newIdentifier.append(oiPrepIdentifier.substring(0, 9));
+        newIdentifier.append(year + "-A-");
+        newIdentifier.append(seqValueWithFiveChars);
+
         patientIdentifier.setIdentifier(newIdentifier.toString());
+
+        incrementNextSeqValueByOne(nextSeqValue, "INIT_ART_SERVICE");
     }
 }

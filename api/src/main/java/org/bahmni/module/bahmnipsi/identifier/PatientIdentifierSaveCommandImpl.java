@@ -42,7 +42,7 @@ public class PatientIdentifierSaveCommandImpl implements EncounterDataPreSaveCom
                 }
             } else if (requiredObs.equalsIgnoreCase(prepInitial)) {
                 try {
-                    patientOiPrepIdentifier.updateOiPrepIdentifier(patientUuid, "P", PREP_INIT_SEQ_TYPE);
+                    patientOiPrepIdentifier.updateOiPrepIdentifier(patientUuid, "PR", PREP_INIT_SEQ_TYPE);
                 } catch (Exception e) {
                     throw new RuntimeException(e.getMessage());
                 }
