@@ -454,6 +454,18 @@ public class PatientOiPrepIdentifierTest {
     }
 
     @Test
+    public void whenPatientCreatedWithIdentifierForYearLessThanCurrentYearPerformNoValidationForSequenceNumber() throws Exception{
+        patient = PatientTestData.setUpPatientData();
+        setUpMocks(patient);
+        String province = "province[0D]";
+        int nextSeqValue = 8;
+
+        when(personAddress.getStateProvince()).thenReturn(province);
+        when(StringUtils.substringBetween(province, "[", "]")).thenReturn("0D");
+        when(patientIdentifierService.getNextSeqValue("INIT_ART_SERVICE")).thenReturn(nextSeqValue);
+    }
+
+    @Test
     public void shouldThrowErrorWhenThereIsAChangeInVisitFromAToP() throws Exception {
         patient = PatientTestData.setOiPrepIdentifierToPatient("00-OA-63-2017-A-01368");
 
@@ -469,6 +481,7 @@ public class PatientOiPrepIdentifierTest {
         verify(patientService, times(1)).getPatientByUuid(patientUuid);
     }
 
+
     @Test
     public void shouldChangeIdentifierAffixWhenThereIsAChangeInVisitFromPToA() throws Exception {
         String identifier = "00-OA-63-2017-P-01368";
@@ -481,6 +494,7 @@ public class PatientOiPrepIdentifierTest {
     }
 
     private void setUpMocks(Patient patient) throws Exception {
+
         String district = "marate[OA]";
         String facility = "harare[12]";
         String province = "province[4A]";
@@ -507,6 +521,7 @@ public class PatientOiPrepIdentifierTest {
         when(patientService.getPatientByUuid(patientUuid)).thenReturn(patient);
         when(Context.getService(PatientIdentifierService.class)).thenReturn(patientIdentifierService);
         when(patientIdentifierService.getIdentifierTypeId(identifierType)).thenReturn(identifierTypeId);
+        when(patientIdentifierService.getIdentifierTypeId("INIT_ART_SERVICE")).thenReturn(6);
         whenNew(PatientIdentifier.class).withNoArguments().thenReturn(patientIdentifier);
         whenNew(PatientIdentifierType.class).withArguments(identifierTypeId).thenReturn(patientIdentifierType);
         doNothing().when(patientIdentifierType).setName(this.identifierType);

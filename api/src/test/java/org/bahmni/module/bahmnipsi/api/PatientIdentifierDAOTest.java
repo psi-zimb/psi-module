@@ -58,6 +58,7 @@ public class PatientIdentifierDAOTest {
         Assert.assertEquals(3, expectedVal);
     }
 
+
     @Test
     public void shouldInitializeSequenceIfNotPresent() {
         String sql = "select next_seq_value from prep_oi_counter where seq_type = :sequenceType";
@@ -82,6 +83,7 @@ public class PatientIdentifierDAOTest {
 
         Assert.assertEquals(0, expectedVal);
     }
+
 
     @Test
     public void shouldGetIdentifierTypeId() {
