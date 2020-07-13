@@ -70,18 +70,14 @@ public class PatientIdentifierDAOTest {
         when(session.createSQLQuery(insertSql)).thenReturn(sqlQuery);
         when(sqlQuery.setParameter("sequenceType", initArtService)).thenReturn(sqlQuery);
         when(sqlQuery.setParameter("nextSeqValue", new Integer(0))).thenReturn(sqlQuery);
-        when(sqlQuery.executeUpdate()).thenReturn(1);
+        when(sqlQuery.uniqueResult()).thenReturn(0);
 
         int expectedVal = patientIdentifierDAO.getNextSeqValue(initArtService);
 
-        verify(sessionFactory, times(2)).getCurrentSession();
+        verify(sessionFactory, times(1)).getCurrentSession();
         verify(session, times(1)).createSQLQuery(sql);
-        verify(session, times(1)).createSQLQuery(insertSql);
-
-
-        verify(sqlQuery, times(2)).setParameter("sequenceType", initArtService);
-        verify(sqlQuery, times(1)).setParameter("nextSeqValue", new Integer(0));
-        verify(sqlQuery, times(1)).executeUpdate();
+        verify(sqlQuery, times(1)).setParameter("sequenceType", initArtService);
+        verify(sqlQuery, times(1)).uniqueResult();
 
 
         Assert.assertEquals(0, expectedVal);

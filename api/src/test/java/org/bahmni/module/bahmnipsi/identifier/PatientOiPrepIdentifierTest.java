@@ -425,7 +425,6 @@ public class PatientOiPrepIdentifierTest {
         when(personAddress.getStateProvince()).thenReturn(province);
         when(StringUtils.substringBetween(province, "[", "]")).thenReturn("0D");
         when(patientIdentifierService.getNextSeqValue("INIT_ART_SERVICE")).thenReturn(nextSeqValue);
-        when(String.format("%05d", nextSeqValue)).thenReturn(suffix);
         doNothing().when(patientIdentifier).setIdentifier(identifier);
         doNothing().when(patientIdentifierService).incrementSeqValueByOne(nextSeqValue + 1, "INIT_ART_SERVICE");
 
@@ -439,8 +438,7 @@ public class PatientOiPrepIdentifierTest {
         Year.now();
         verifyStatic(VerificationModeFactory.times(3));
         Context.getService(PatientIdentifierService.class);
-        verifyStatic(VerificationModeFactory.times(1));
-        String.format("%05d", nextSeqValue);
+
 
         verify(patientService, times(2)).getPatientByUuid(patientUuid);
         verify(personService, times(1)).getPersonByUuid(patientUuid);
@@ -476,7 +474,7 @@ public class PatientOiPrepIdentifierTest {
         String identifier = "00-OA-63-2017-P-01368";
         patient = PatientTestData.setOiPrepIdentifierToPatient(identifier);
         setUpMocks(patient);
-
+        when(Context.getService(PatientIdentifierService.class).getNextSeqValue(anyString())).thenReturn(1368);
         patientOiPrepIdentifier.updateOiPrepIdentifier(patientUuid, "A", "INIT_ART_SERVICE");
 
         Assert.assertEquals("00-OA-63-2017-A-01368", patient.getPatientIdentifier(identifierType).getIdentifier());
@@ -492,7 +490,7 @@ public class PatientOiPrepIdentifierTest {
         PowerMockito.mockStatic(Context.class);
         PowerMockito.mockStatic(Year.class);
         PowerMockito.mockStatic(StringUtils.class);
-        PowerMockito.mockStatic(String.class);
+        //PowerMockito.mockStatic(String.class);
 
         when(Context.getPersonService()).thenReturn(personService);
         when(personService.getPersonByUuid(patientUuid)).thenReturn(person);
