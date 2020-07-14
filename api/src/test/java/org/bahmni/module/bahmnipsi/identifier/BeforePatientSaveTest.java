@@ -128,7 +128,7 @@ public class BeforePatientSaveTest {
         doNothing().when(patientUICIdentifier).updateUICIdentifier(patient);
         when(patientIdentifierService.getNextSeqValue(Matchers.anyString())).thenReturn(4);
         when(Context.getService(PatientIdentifierService.class)).thenReturn(patientIdentifierService);
-        exception.expectMessage("Next available Initial ART sequence number is 10 . Last five digits of PREP/OI Identifier entered cannot be greater than Next Available Sequence number. Update PrEP/OI Identifier to 00-OA-63-2020-A-10");
+        exception.expectMessage("Next available Initial ART sequence number is 4 . Last five digits of PREP/OI Identifier entered cannot be greater than Next Available Sequence number. Update PrEP/OI Identifier to 00-OA-63-2020-A-4");
         exception.expect(RuntimeException.class);
 
         BeforePatientSave beforePatientSave = new BeforePatientSave();

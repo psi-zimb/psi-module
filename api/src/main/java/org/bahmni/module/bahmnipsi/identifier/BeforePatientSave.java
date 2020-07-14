@@ -54,15 +54,19 @@ public class BeforePatientSave implements MethodBeforeAdvice {
                         }
                         int nextSequenceValue = Context.getService(PatientIdentifierService.class).getNextSeqValue(sequenceType);
                         int sequenceId = Integer.parseInt(sequenceIdEntered);
+
                         int year = Integer.parseInt(prepOiIdentifier.split("-")[3]);
                         if (IsEnteredYearGreaterThanCurrentYear(year)) {
                             throw new RuntimeException("Year in identifier cannot be greater than current year.");
                         }
-                        if (Calendar.getInstance().get(Calendar.YEAR) == year && nextSequenceValue < sequenceId) {
-                            String proposedSequenceId = String.valueOf(sequenceId + 1);
-                            throw new RuntimeException("Next available "+sequence+" sequence number is " + proposedSequenceId + " . Last five digits of PREP/OI Identifier entered cannot be" +
-                                    " greater than Next Available Sequence number. Update PrEP/OI Identifier to " + prepOiIdentifier.substring(0, prepOiIdentifier.indexOf(sequenceIdEntered)) + proposedSequenceId);
-                        } else if (nextSequenceValue == sequenceId) {
+                        if (Calendar.getInstance().get(Calendar.YEAR) == year) {
+                            if (nextSequenceValue < sequenceId) {
+                                throw new RuntimeException("Next available " + sequence + " sequence number is " + nextSequenceValue + " . Last five digits of PREP/OI Identifier entered cannot be" +
+                                        " greater than Next Available Sequence number. Update PrEP/OI Identifier to " + prepOiIdentifier.substring(0, prepOiIdentifier.indexOf(sequenceIdEntered)) + nextSequenceValue);
+
+                            }
+                        }
+                        if (nextSequenceValue == sequenceId) {
                             Context.getService(PatientIdentifierService.class).incrementSeqValueByOne(nextSequenceValue, sequenceType);
                         }
                     }
