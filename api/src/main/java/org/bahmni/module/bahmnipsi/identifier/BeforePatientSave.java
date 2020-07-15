@@ -9,6 +9,8 @@ import org.springframework.aop.MethodBeforeAdvice;
 import java.lang.reflect.Method;
 import java.util.Calendar;
 
+import static org.bahmni.module.bahmnipsi.identifier.PatientOiPrepIdentifier.oiPrepIdentifierSuffixLength;
+
 public class BeforePatientSave implements MethodBeforeAdvice {
 
     private static final String methodToIntercept = "savePatient";
@@ -62,7 +64,7 @@ public class BeforePatientSave implements MethodBeforeAdvice {
                         if (Calendar.getInstance().get(Calendar.YEAR) == year) {
                             if (nextSequenceValue < sequenceId) {
                                 throw new RuntimeException("Next available " + sequence + " sequence number is " + nextSequenceValue + " . Last five digits of PREP/OI Identifier entered cannot be" +
-                                        " greater than Next Available Sequence number. Update PrEP/OI Identifier to " + prepOiIdentifier.substring(0, prepOiIdentifier.indexOf(sequenceIdEntered)) + nextSequenceValue);
+                                        " greater than Next Available Sequence number. Update PrEP/OI Identifier to " + prepOiIdentifier.substring(0, prepOiIdentifier.indexOf(sequenceIdEntered)) + String.format("%0"+ oiPrepIdentifierSuffixLength +"d", nextSequenceValue));
 
                             }
                         }

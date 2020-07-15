@@ -14,7 +14,7 @@ import java.util.List;
 public class PatientOiPrepIdentifier {
 
     private String identifierType = "PREP/OI Identifier";
-    private static final int oiPrepIdentifierSuffixLength = 5;
+    public static final int oiPrepIdentifierSuffixLength = 5;
     private final int affixIndex = 14;
     private final int codesLength = 2;
 
