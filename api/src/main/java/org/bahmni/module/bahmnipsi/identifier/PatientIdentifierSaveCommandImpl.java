@@ -1,15 +1,24 @@
 package org.bahmni.module.bahmnipsi.identifier;
 
+import org.openmrs.Patient;
+import org.openmrs.PatientProgram;
+import org.openmrs.Person;
+import org.openmrs.Program;
 import org.openmrs.module.bahmniemrapi.encountertransaction.command.EncounterDataPreSaveCommand;
 import org.openmrs.module.bahmniemrapi.encountertransaction.contract.BahmniEncounterTransaction;
 import org.openmrs.module.bahmniemrapi.encountertransaction.contract.BahmniObservation;
+import org.openmrs.util.DatabaseUpdateException;
+import org.openmrs.util.InputRequiredException;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import sun.net.www.protocol.http.HttpURLConnection;
+import sun.net.www.protocol.https.HttpsURLConnectionImpl;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.LinkedHashMap;
+import javax.net.ssl.HttpsURLConnection;
+import java.io.IOException;
+import java.net.URL;
+import java.util.*;
 
 @Component
 public class PatientIdentifierSaveCommandImpl implements EncounterDataPreSaveCommand {
@@ -36,8 +45,10 @@ public class PatientIdentifierSaveCommandImpl implements EncounterDataPreSaveCom
         if (!requiredObs.isEmpty()) {
             if (requiredObs.equalsIgnoreCase(initialArt)) {
                 try {
+                    autoEnrollIntoProgram(groupMembers);
                     patientOiPrepIdentifier.updateOiPrepIdentifier(patientUuid, "A", INIT_ART_SEQ_TYPE);
                 } catch (Exception e) {
+                    e.printStackTrace();
                     throw new RuntimeException(e.getMessage());
                 }
             } else if (requiredObs.equalsIgnoreCase(prepInitial)) {
@@ -99,5 +110,36 @@ public class PatientIdentifierSaveCommandImpl implements EncounterDataPreSaveCom
     @Override
     public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
         return bean;
+    }
+
+    private void autoEnrollIntoProgram(Collection<BahmniObservation> groupMembers) throws IOException, DatabaseUpdateException, InputRequiredException {
+
+        URL url = new URL("https://localhost/openmrs/ws/rest/v1/program");
+        HttpsURLConnectionImpl con = (HttpsURLConnectionImpl)url.openConnection();
+        con.setDefaultHostnameVerifier ((hostname, session) -> true);
+        con.setRequestMethod("GET");
+        con.setRequestProperty("Content-Type", "application/json");
+        String credential = Base64.getEncoder().encodeToString( ("superman"+":"+"Admin123").getBytes("UTF-8"));
+        con.addRequestProperty("Authorization", "Basic " + credential.substring(0, credential.length()-1));
+
+        PatientProgram patientProgram = new PatientProgram();
+        Patient patient = new Patient();
+        Person person = new Person();
+        person.setUuid("d44c703a-e526-4395-ba4f-af7ddf0d2155");
+
+        patientProgram.setPatient(patient);
+        patientProgram.setDateEnrolled(new Date());
+
+        Program program = new Program();
+        program.setUuid("26a51046-b88b-11e9-b67c-080027e15975");
+        patientProgram.setProgram(program);
+
+        for (BahmniObservation member : groupMembers) {
+            LinkedHashMap<String, String> value = (LinkedHashMap<String, String>) member.getValue();
+            if (value != null && value.get("name").equals(initialArt)) {
+            }
+        }
+       // BahmniProgramWorkflowService service =  Context.getService(BahmniProgramWorkflowService.class);
+       // PatientProgram patProgram = service.savePatientProgram(patientProgram);
     }
 }
