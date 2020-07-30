@@ -1,9 +1,12 @@
 package org.bahmni.module.bahmnipsi.identifier;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.openmrs.Patient;
 import org.openmrs.PatientProgram;
 import org.openmrs.Person;
 import org.openmrs.Program;
+import org.openmrs.api.context.Context;
 import org.openmrs.module.bahmniemrapi.encountertransaction.command.EncounterDataPreSaveCommand;
 import org.openmrs.module.bahmniemrapi.encountertransaction.contract.BahmniEncounterTransaction;
 import org.openmrs.module.bahmniemrapi.encountertransaction.contract.BahmniObservation;
@@ -12,10 +15,7 @@ import org.openmrs.util.InputRequiredException;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import sun.net.www.protocol.http.HttpURLConnection;
-import sun.net.www.protocol.https.HttpsURLConnectionImpl;
-
-import javax.net.ssl.HttpsURLConnection;
+import  java.net.HttpURLConnection;
 import java.io.IOException;
 import java.net.URL;
 import java.util.*;
@@ -29,6 +29,7 @@ public class PatientIdentifierSaveCommandImpl implements EncounterDataPreSaveCom
     private final String INIT_ART_SEQ_TYPE = "INIT_ART_SERVICE";
     private final String PREP_INIT_SEQ_TYPE = "PrEP_INIT";
     private PatientOiPrepIdentifier patientOiPrepIdentifier;
+    private Log log = LogFactory.getLog(this.getClass());
 
     @Autowired
     public PatientIdentifierSaveCommandImpl(PatientOiPrepIdentifier patientOiPrepIdentifier) {
@@ -45,7 +46,7 @@ public class PatientIdentifierSaveCommandImpl implements EncounterDataPreSaveCom
         if (!requiredObs.isEmpty()) {
             if (requiredObs.equalsIgnoreCase(initialArt)) {
                 try {
-                    autoEnrollIntoProgram(groupMembers);
+                    autoEnrollIntoProgram(bahmniEncounterTransaction);
                     patientOiPrepIdentifier.updateOiPrepIdentifier(patientUuid, "A", INIT_ART_SEQ_TYPE);
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -112,34 +113,33 @@ public class PatientIdentifierSaveCommandImpl implements EncounterDataPreSaveCom
         return bean;
     }
 
-    private void autoEnrollIntoProgram(Collection<BahmniObservation> groupMembers) throws IOException, DatabaseUpdateException, InputRequiredException {
+    private void autoEnrollIntoProgram(BahmniEncounterTransaction bahmniEncounterTransaction) throws IOException, DatabaseUpdateException, InputRequiredException {
 
-        URL url = new URL("https://localhost/openmrs/ws/rest/v1/program");
-        HttpsURLConnectionImpl con = (HttpsURLConnectionImpl)url.openConnection();
-        con.setDefaultHostnameVerifier ((hostname, session) -> true);
-        con.setRequestMethod("GET");
-        con.setRequestProperty("Content-Type", "application/json");
-        String credential = Base64.getEncoder().encodeToString( ("superman"+":"+"Admin123").getBytes("UTF-8"));
-        con.addRequestProperty("Authorization", "Basic " + credential.substring(0, credential.length()-1));
-
+//        URL url = new URL("http://localhost/openmrs/ws/rest/v1/program");
+//        HttpURLConnection con = (HttpURLConnection)url.openConnection();
+//        con.setRequestMethod("GET");
+//        con.setRequestProperty("Content-Type", "application/json");
+//        String credential = Base64.getEncoder().encodeToString( ("superman"+":"+"Admin123").getBytes("UTF-8"));
+//        con.addRequestProperty("Authorization", "Basic " + credential.substring(0, credential.length()-1));
+//        con.connect();
+//        String response = con.getResponseMessage();
+//        con.disconnect();
+//        log.info(response);
+//        //new stuff
         PatientProgram patientProgram = new PatientProgram();
         Patient patient = new Patient();
-        Person person = new Person();
-        person.setUuid("d44c703a-e526-4395-ba4f-af7ddf0d2155");
+        patient.setId(Integer.valueOf(bahmniEncounterTransaction.getPatientId()));
+        patient.setUuid(bahmniEncounterTransaction.getPatientUuid());
 
         patientProgram.setPatient(patient);
         patientProgram.setDateEnrolled(new Date());
 
         Program program = new Program();
+        program.setProgramId(6);
         program.setUuid("26a51046-b88b-11e9-b67c-080027e15975");
         patientProgram.setProgram(program);
 
-        for (BahmniObservation member : groupMembers) {
-            LinkedHashMap<String, String> value = (LinkedHashMap<String, String>) member.getValue();
-            if (value != null && value.get("name").equals(initialArt)) {
-            }
-        }
-       // BahmniProgramWorkflowService service =  Context.getService(BahmniProgramWorkflowService.class);
-       // PatientProgram patProgram = service.savePatientProgram(patientProgram);
+        Context.getProgramWorkflowService().savePatientProgram(patientProgram);
+//        Context.getProgramWorkflowService().getAllPrograms()
     }
 }
