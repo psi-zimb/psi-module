@@ -28,16 +28,16 @@ public class PatientIdentifierSaveCommandImpl implements EncounterDataPreSaveCom
     private AutoEnrolIntoProgram autoEnrolIntoProgram;
     private Log log = LogFactory.getLog(this.getClass());
 
-    @Autowired
-    public PatientIdentifierSaveCommandImpl(PatientOiPrepIdentifier patientOiPrepIdentifier) {
-        this.patientOiPrepIdentifier = patientOiPrepIdentifier;
-    }
-
 //    @Autowired
-//    public PatientIdentifierSaveCommandImpl(PatientOiPrepIdentifier patientOiPrepIdentifier,AutoEnrolIntoProgram autoEnrolIntoProgram) {
+//    public PatientIdentifierSaveCommandImpl(PatientOiPrepIdentifier patientOiPrepIdentifier) {
 //        this.patientOiPrepIdentifier = patientOiPrepIdentifier;
-//        this.autoEnrolIntoProgram = autoEnrolIntoProgram;
 //    }
+
+    @Autowired
+    public PatientIdentifierSaveCommandImpl(PatientOiPrepIdentifier patientOiPrepIdentifier,AutoEnrolIntoProgram autoEnrolIntoProgram) {
+        this.patientOiPrepIdentifier = patientOiPrepIdentifier;
+        this.autoEnrolIntoProgram = autoEnrolIntoProgram;
+    }
     @Override
     public BahmniEncounterTransaction update(BahmniEncounterTransaction bahmniEncounterTransaction) {
         String patientUuid = bahmniEncounterTransaction.getPatientUuid();
@@ -48,7 +48,7 @@ public class PatientIdentifierSaveCommandImpl implements EncounterDataPreSaveCom
         if (!requiredObs.isEmpty()) {
             if (requiredObs.equalsIgnoreCase(initialArt)) {
                 try {
-                    autoEnrollIntoProgram(bahmniEncounterTransaction);
+                    autoEnrolIntoProgram.autoEnrollIntoProgram(bahmniEncounterTransaction);
                     patientOiPrepIdentifier.updateOiPrepIdentifier(patientUuid, "A", INIT_ART_SEQ_TYPE);
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -117,28 +117,5 @@ public class PatientIdentifierSaveCommandImpl implements EncounterDataPreSaveCom
     @Override
     public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
         return bean;
-    }
-
-    public void autoEnrollIntoProgram(BahmniEncounterTransaction bahmniEncounterTransaction) {
-
-        /*
-        * Section to get Programs and get programId mapped to VisitType
-        * List<Program> programs = Context.getProgramWorkflowService().getAllPrograms();
-        * */
-
-        /*
-        * Section to get enrollment details
-        *  Context.getProgramWorkflowService().getPatientProgramByUuid(bahmniEncounterTransaction.getPatientUuid());
-        * */
-        PatientProgram patientProgram = new PatientProgram();
-        Patient patient = Context.getPatientService().getPatientByUuid(bahmniEncounterTransaction.getPatientUuid());
-        Program program = new Program();
-        program.setProgramId(6);
-        program.setUuid("26a51046-b88b-11e9-b67c-080027e15975");
-        patientProgram.setPatient(patient);
-        patientProgram.setProgram(program);
-        patientProgram.setDateEnrolled(new Date());
-
-        Context.getProgramWorkflowService().savePatientProgram(patientProgram);
     }
 }

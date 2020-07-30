@@ -8,6 +8,7 @@ import org.openmrs.module.bahmniemrapi.encountertransaction.contract.BahmniEncou
 import org.springframework.stereotype.Component;
 
 import java.util.Date;
+import java.util.List;
 
 @Component
 public class AutoEnrolIntoProgram {
@@ -15,18 +16,28 @@ public class AutoEnrolIntoProgram {
 
     public void autoEnrollIntoProgram(BahmniEncounterTransaction bahmniEncounterTransaction) {
 
+        /*
+         * Section to get Programs and get programId mapped to VisitType
+         * List<Program> programs = Context.getProgramWorkflowService().getAllPrograms();
+         * */
+
+        /*
+         * Section to get enrollment details
+         *  Context.getProgramWorkflowService().getPatientProgramByUuid(bahmniEncounterTransaction.getPatientUuid());
+         * */
         PatientProgram patientProgram = new PatientProgram();
-        Patient patient = new Patient();
-        patient.setId(Integer.valueOf(bahmniEncounterTransaction.getPatientId()));
-        patient.setUuid(bahmniEncounterTransaction.getPatientUuid());
-
-
+        Patient patient = Context.getPatientService().getPatientByUuid(bahmniEncounterTransaction.getPatientUuid());
         Program program = new Program();
         program.setProgramId(6);
         program.setUuid("26a51046-b88b-11e9-b67c-080027e15975");
+        patientProgram.setPatient(patient);
         patientProgram.setProgram(program);
         patientProgram.setDateEnrolled(new Date());
 
         Context.getProgramWorkflowService().savePatientProgram(patientProgram);
+    }
+
+    private List<Program> getProgramsList(){
+        return Context.getProgramWorkflowService().getAllPrograms();
     }
 }

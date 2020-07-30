@@ -54,7 +54,7 @@ public class PatientIdentifierSaveCommandImplTest {
     @Rule
     public final ExpectedException exception = ExpectedException.none();
 
-    private PatientIdentifierSaveCommandImpl patientIdentifierSaveCommandImpl = new PatientIdentifierSaveCommandImpl(patientOiPrepIdentifier);
+    private PatientIdentifierSaveCommandImpl patientIdentifierSaveCommandImpl = new PatientIdentifierSaveCommandImpl(patientOiPrepIdentifier,autoEnrolIntoProgram);
 
     private String patientUuid = "23ffg-54lkk-lk";
     private Patient patient;
@@ -256,6 +256,6 @@ public class PatientIdentifierSaveCommandImplTest {
         patientIdentifierSaveCommandImpl.setAutoEnrolIntoProgram(autoEnrolIntoProgram);
         patientIdentifierSaveCommandImpl.update(bahmniEncounterTransaction);
 
-        //verify(autoEnrolIntoProgram, times(1)).autoEnrollIntoProgram(bahmniEncounterTransaction);
+        verify(autoEnrolIntoProgram, times(1)).autoEnrollIntoProgram(bahmniEncounterTransaction);
     }
 }
