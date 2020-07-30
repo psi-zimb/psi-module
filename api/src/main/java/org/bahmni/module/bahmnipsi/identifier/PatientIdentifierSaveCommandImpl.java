@@ -1,12 +1,11 @@
 package org.bahmni.module.bahmnipsi.identifier;
 
-import org.apache.http.HttpResponse;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.entity.ContentType;
-import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.HttpClientBuilder;
-import org.openmrs.*;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.bahmni.module.bahmnipsi.enrollment.AutoEnrolIntoProgram;
+import org.openmrs.Patient;
+import org.openmrs.PatientProgram;
+import org.openmrs.Program;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.bahmniemrapi.encountertransaction.command.EncounterDataPreSaveCommand;
 import org.openmrs.module.bahmniemrapi.encountertransaction.contract.BahmniEncounterTransaction;
@@ -14,9 +13,7 @@ import org.openmrs.module.bahmniemrapi.encountertransaction.contract.BahmniObser
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import sun.net.www.protocol.https.HttpsURLConnectionImpl;
 
-import java.net.URL;
 import java.util.*;
 
 @Component
@@ -28,12 +25,19 @@ public class PatientIdentifierSaveCommandImpl implements EncounterDataPreSaveCom
     private final String INIT_ART_SEQ_TYPE = "INIT_ART_SERVICE";
     private final String PREP_INIT_SEQ_TYPE = "PrEP_INIT";
     private PatientOiPrepIdentifier patientOiPrepIdentifier;
+    private AutoEnrolIntoProgram autoEnrolIntoProgram;
+    private Log log = LogFactory.getLog(this.getClass());
 
     @Autowired
     public PatientIdentifierSaveCommandImpl(PatientOiPrepIdentifier patientOiPrepIdentifier) {
         this.patientOiPrepIdentifier = patientOiPrepIdentifier;
     }
 
+//    @Autowired
+//    public PatientIdentifierSaveCommandImpl(PatientOiPrepIdentifier patientOiPrepIdentifier,AutoEnrolIntoProgram autoEnrolIntoProgram) {
+//        this.patientOiPrepIdentifier = patientOiPrepIdentifier;
+//        this.autoEnrolIntoProgram = autoEnrolIntoProgram;
+//    }
     @Override
     public BahmniEncounterTransaction update(BahmniEncounterTransaction bahmniEncounterTransaction) {
         String patientUuid = bahmniEncounterTransaction.getPatientUuid();
@@ -44,7 +48,7 @@ public class PatientIdentifierSaveCommandImpl implements EncounterDataPreSaveCom
         if (!requiredObs.isEmpty()) {
             if (requiredObs.equalsIgnoreCase(initialArt)) {
                 try {
-                    autoEnrollIntoProgram(groupMembers);
+                    autoEnrollIntoProgram(bahmniEncounterTransaction);
                     patientOiPrepIdentifier.updateOiPrepIdentifier(patientUuid, "A", INIT_ART_SEQ_TYPE);
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -101,6 +105,10 @@ public class PatientIdentifierSaveCommandImpl implements EncounterDataPreSaveCom
         this.patientOiPrepIdentifier = patientOiPrepIdentifier;
     }
 
+    public void setAutoEnrolIntoProgram(AutoEnrolIntoProgram autoEnrolIntoProgram){
+        this.autoEnrolIntoProgram = autoEnrolIntoProgram;
+    }
+
     @Override
     public Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException {
         return bean;
@@ -111,81 +119,26 @@ public class PatientIdentifierSaveCommandImpl implements EncounterDataPreSaveCom
         return bean;
     }
 
-    private void autoEnrollIntoProgram(Collection<BahmniObservation> groupMembers) throws Exception {
+    public void autoEnrollIntoProgram(BahmniEncounterTransaction bahmniEncounterTransaction) {
 
-        //try
-        {
-            URL url = new URL("https://dev-91.digitalhealthunit.org/openmrs/ws/rest/v1/program");
-            HttpsURLConnectionImpl con = (HttpsURLConnectionImpl) url.openConnection();
-            con.setDefaultHostnameVerifier((hostname, session) -> true);
-            con.setRequestMethod("GET");
-            con.setRequestProperty("Content-Type", "application/json");
-            String credential = Base64.getEncoder().encodeToString(("superman" + ":" + "Admin123").getBytes("UTF-8"));
-            con.addRequestProperty("Authorization", "Basic " + credential.substring(0, credential.length() - 1));
+        /*
+        * Section to get Programs and get programId mapped to VisitType
+        * List<Program> programs = Context.getProgramWorkflowService().getAllPrograms();
+        * */
 
-            System.out.println(con.getResponseCode() + con.getResponseMessage());
+        /*
+        * Section to get enrollment details
+        *  Context.getProgramWorkflowService().getPatientProgramByUuid(bahmniEncounterTransaction.getPatientUuid());
+        * */
+        PatientProgram patientProgram = new PatientProgram();
+        Patient patient = Context.getPatientService().getPatientByUuid(bahmniEncounterTransaction.getPatientUuid());
+        Program program = new Program();
+        program.setProgramId(6);
+        program.setUuid("26a51046-b88b-11e9-b67c-080027e15975");
+        patientProgram.setPatient(patient);
+        patientProgram.setProgram(program);
+        patientProgram.setDateEnrolled(new Date());
 
-            StringBuffer sbf = new StringBuffer();
-            sbf.append(con.getResponseCode() + con.getResponseMessage());
-
-            PatientProgram patientProgram = new PatientProgram();
-            Patient patient = new Patient();
-            Person person = new Person();
-            person.setUuid("6353499f-e039-4147-9b4d-5c20101a9107");
-
-            patientProgram.setPatient(patient);
-            patientProgram.setDateEnrolled(new Date());
-
-            PatientState patientState = new PatientState();
-            patientState.setDateCreated(new Date());
-
-            Set<PatientState> sets = new TreeSet<PatientState>();
-            sets.add(patientState);
-
-            patientProgram.setStates(sets);
-
-            Program program = new Program();
-            program.setUuid("26a51046-b88b-11e9-b67c-080027e15975");
-            patientProgram.setProgram(program);
-
-            for (BahmniObservation member : groupMembers) {
-                LinkedHashMap<String, String> value = (LinkedHashMap<String, String>) member.getValue();
-                if (value != null && value.get("name").equals(initialArt)) {
-                }
-            }
-
-            //url = new URL("https://dev-91.digitalhealthunit.org/openmrs/ws/rest/v1/bahmniprogramenrollment");
-            String payload = "{" +
-                    "\"patient\": \"6353499f-e039-4147-9b4d-5c20101a9107\"," +
-                    "\"program\": \"26a51046-b88b-11e9-b67c-080027e15975\"," +
-                    "\"dateEnrolled\": \"2020-07-30T00:00:00+0530\"" +
-                    "}";
-            StringEntity entity = new StringEntity(payload,
-                    ContentType.APPLICATION_JSON);
-
-            HttpClient httpClient = HttpClientBuilder.create().build();
-            HttpPost request = new HttpPost("https://dev-91.digitalhealthunit.org/openmrs/ws/rest/v1/bahmniprogramenrollment");
-            request.setEntity(entity);
-            request.setHeader("Connection","keep-alive");
-            request.setHeader("Content-Type", "application/json;charset=UTF-8");
-            request.setHeader("Disable-WWW-Authenticate", "true");
-            request.setHeader("Host","dev-91.digitalhealthunit.org");
-            request.setHeader("Authorization",("Basic " + credential.substring(0, credential.length() - 1)));
-            sbf.append(entity.toString());
-            sbf.append(request);
-
-            HttpResponse response = httpClient.execute(request);
-            System.out.println("Calling Enrollment API" + response.getStatusLine().getStatusCode());
-            sbf.append("Calling Enrollment API" + response.getStatusLine().getStatusCode()+ response);
-            //Context.getService(BahmniProgramWorkflowService.class);
-            throw new Exception(sbf.toString());
-        }
-//        catch(Exception e)
-//        {
-//            e.printStackTrace();
-//            throw e;
-//        }
-//       BahmniProgramWorkflowService service =  Context.getService(BahmniProgramWorkflowService.class);
-//       PatientProgram patProgram = service.savePatientProgram(patientProgram);
+        Context.getProgramWorkflowService().savePatientProgram(patientProgram);
     }
 }

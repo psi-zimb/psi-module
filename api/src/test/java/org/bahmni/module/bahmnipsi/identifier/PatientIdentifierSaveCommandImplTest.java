@@ -5,6 +5,7 @@ package org.bahmni.module.bahmnipsi.identifier;
 //import org.bahmni.module.bahmnicore.service.BahmniProgramWorkflowService;
 //import org.bahmni.module.bahmnicore.service.impl.BahmniProgramWorkflowServiceImpl;
 import org.bahmni.module.bahmnipsi.PatientTestData;
+import org.bahmni.module.bahmnipsi.enrollment.AutoEnrolIntoProgram;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -16,6 +17,7 @@ import org.openmrs.PatientProgram;
 import org.openmrs.Person;
 import org.openmrs.Program;
 import org.openmrs.api.PatientService;
+import org.openmrs.api.ProgramWorkflowService;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.bahmniemrapi.encountertransaction.contract.BahmniEncounterTransaction;
 import org.openmrs.module.bahmniemrapi.encountertransaction.contract.BahmniObservation;
@@ -41,23 +43,19 @@ public class PatientIdentifierSaveCommandImplTest {
     private PatientOiPrepIdentifier patientOiPrepIdentifier;
 
     @Mock
+    private AutoEnrolIntoProgram autoEnrolIntoProgram;
+
+    @Mock
     private PatientService patientService;
 
-   // private BahmniProgramWorkflowService bahmniProgramWorkflowService;
-
-//    @Mock
-//    private EpisodeService episodeService;
-//
-//    @Mock
-//    private BahmniProgramWorkflowDAO bahmniProgramWorkflowDAO;
-//
-//    @Mock
-//    private BahmniHibernateProgramWorkflowDAOImpl bahmniHibernateProgramWorkflowDAOImpl;
+    @Mock
+    private ProgramWorkflowService bahmniProgramWorkflowService;
 
     @Rule
     public final ExpectedException exception = ExpectedException.none();
 
     private PatientIdentifierSaveCommandImpl patientIdentifierSaveCommandImpl = new PatientIdentifierSaveCommandImpl(patientOiPrepIdentifier);
+
     private String patientUuid = "23ffg-54lkk-lk";
     private Patient patient;
     private String initialArtService = "Initial ART service";
@@ -67,19 +65,19 @@ public class PatientIdentifierSaveCommandImplTest {
     @Before
     public void setUp() {
         patient = PatientTestData.setUpPatientData();
-        //bahmniProgramWorkflowService = new BahmniProgramWorkflowServiceImpl(bahmniProgramWorkflowDAO,episodeService);
         mockStatic(Context.class);
         PowerMockito.when(Context.getPatientService()).thenReturn(patientService);
         PowerMockito.when(patientService.getPatientByUuid(patientUuid)).thenReturn(patient);
-        //PowerMockito.when(Context.getService(BahmniProgramWorkflowService.class)).thenReturn(bahmniProgramWorkflowService);
-       // PowerMockito.when(patientOiPrepIdentifier.updateOiPrepIdentifier(patientUuid,"A","INIT_ART_SERVICE")).thenReturn(true);
+        PowerMockito.when(Context.getProgramWorkflowService()).thenReturn(bahmniProgramWorkflowService);
     }
 
     @Test
     public void shouldCallUpdateOiPrepIdentifierWithAffixAWhenServiceIsInitialArt() throws Exception {
         patientIdentifierSaveCommandImpl.setPatientOiPrepIdentifier(patientOiPrepIdentifier);
+        patientIdentifierSaveCommandImpl.setAutoEnrolIntoProgram(autoEnrolIntoProgram);
         doNothing().when(patientOiPrepIdentifier).updateOiPrepIdentifier(patientUuid, "A", "INIT_ART_SERVICE");
         BahmniEncounterTransaction bahmniEncounterTransaction = PatientTestData.setUpEncounterTransactionDataWith(initialArtService,conceptName, patientUuid);
+        bahmniEncounterTransaction.setPatientId("1234");
         patientIdentifierSaveCommandImpl.update(bahmniEncounterTransaction);
 
         verify(patientOiPrepIdentifier, times(1)).updateOiPrepIdentifier(patientUuid, "A", "INIT_ART_SERVICE");
@@ -98,10 +96,12 @@ public class PatientIdentifierSaveCommandImplTest {
     @Test
     public void shouldThrowExceptionWhenOiPrepIdentifierIsNotUpdatedWithInitialArtVisit() throws Exception {
         patientIdentifierSaveCommandImpl.setPatientOiPrepIdentifier(patientOiPrepIdentifier);
+        patientIdentifierSaveCommandImpl.setAutoEnrolIntoProgram(autoEnrolIntoProgram);
         exception.expect(RuntimeException.class);
 
         doThrow(RuntimeException.class).when(patientOiPrepIdentifier).updateOiPrepIdentifier(patientUuid, "A", "INIT_ART_SERVICE");
         BahmniEncounterTransaction bahmniEncounterTransaction = PatientTestData.setUpEncounterTransactionDataWith(initialArtService, conceptName, patientUuid);
+        bahmniEncounterTransaction.setPatientId("1234");
         patientIdentifierSaveCommandImpl.update(bahmniEncounterTransaction);
 
         verify(patientOiPrepIdentifier, times(1)).updateOiPrepIdentifier(patientUuid, "A", "INIT_ART_SERVICE");
@@ -192,7 +192,6 @@ public class PatientIdentifierSaveCommandImplTest {
         patient = PatientTestData.setOiPrepIdentifierToPatient(identifier);
 
         PowerMockito.when(patientService.getPatientByUuid(patientUuid)).thenReturn(patient);
-        //when(bahmniProgramWorkflowDAO.savePatientProgram(patientProgram)).thenReturn(patientProgram);
 
         String conceptName = "Reason for visit";
         EncounterTransaction.Concept concept = new EncounterTransaction.Concept();
@@ -213,10 +212,12 @@ public class PatientIdentifierSaveCommandImplTest {
         bahmniEncounterTransaction.setObservations(Arrays.asList(obs));
 
         patientIdentifierSaveCommandImpl.update(bahmniEncounterTransaction);
+
+        verify(autoEnrolIntoProgram, never()).autoEnrollIntoProgram(bahmniEncounterTransaction);
     }
 
     @Test
-    public void shouldCallEnrollIfVisitTypeIsOtherThanInitialART() throws Exception {
+    public void shouldCallEnrollIfVisitTypeIsInitialART() throws Exception {
         String identifier = "00-OA-63-2017-P-01368";
         PatientProgram patientProgram = new PatientProgram();
         Patient patient = new Patient();
@@ -232,7 +233,6 @@ public class PatientIdentifierSaveCommandImplTest {
         patient = PatientTestData.setOiPrepIdentifierToPatient(identifier);
 
         PowerMockito.when(patientService.getPatientByUuid(patientUuid)).thenReturn(patient);
-        //when(bahmniProgramWorkflowDAO.savePatientProgram(patientProgram)).thenReturn(patientProgram);
 
         String conceptName = "Reason for visit";
         EncounterTransaction.Concept concept = new EncounterTransaction.Concept();
@@ -250,8 +250,12 @@ public class PatientIdentifierSaveCommandImplTest {
         BahmniEncounterTransaction bahmniEncounterTransaction = new BahmniEncounterTransaction();
 
         bahmniEncounterTransaction.setPatientUuid(patientUuid);
+        bahmniEncounterTransaction.setPatientId("1234");
         bahmniEncounterTransaction.setObservations(Arrays.asList(obs));
         patientIdentifierSaveCommandImpl.setPatientOiPrepIdentifier(patientOiPrepIdentifier);
+        patientIdentifierSaveCommandImpl.setAutoEnrolIntoProgram(autoEnrolIntoProgram);
         patientIdentifierSaveCommandImpl.update(bahmniEncounterTransaction);
+
+        //verify(autoEnrolIntoProgram, times(1)).autoEnrollIntoProgram(bahmniEncounterTransaction);
     }
 }
