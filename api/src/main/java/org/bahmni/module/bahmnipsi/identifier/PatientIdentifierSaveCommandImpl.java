@@ -11,16 +11,11 @@ import org.openmrs.api.context.Context;
 import org.openmrs.module.bahmniemrapi.encountertransaction.command.EncounterDataPreSaveCommand;
 import org.openmrs.module.bahmniemrapi.encountertransaction.contract.BahmniEncounterTransaction;
 import org.openmrs.module.bahmniemrapi.encountertransaction.contract.BahmniObservation;
-import org.openmrs.util.DatabaseUpdateException;
-import org.openmrs.util.InputRequiredException;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import sun.net.www.protocol.http.HttpURLConnection;
 import sun.net.www.protocol.https.HttpsURLConnectionImpl;
 
-import javax.net.ssl.HttpsURLConnection;
-import java.io.IOException;
 import java.net.URL;
 import java.util.*;
 
@@ -116,9 +111,10 @@ public class PatientIdentifierSaveCommandImpl implements EncounterDataPreSaveCom
         return bean;
     }
 
-    private void autoEnrollIntoProgram(Collection<BahmniObservation> groupMembers) throws IOException, DatabaseUpdateException, InputRequiredException {
+    private void autoEnrollIntoProgram(Collection<BahmniObservation> groupMembers) throws Exception {
 
-        try {
+        //try
+        {
             URL url = new URL("https://dev-91.digitalhealthunit.org/openmrs/ws/rest/v1/program");
             HttpsURLConnectionImpl con = (HttpsURLConnectionImpl) url.openConnection();
             con.setDefaultHostnameVerifier((hostname, session) -> true);
@@ -128,6 +124,9 @@ public class PatientIdentifierSaveCommandImpl implements EncounterDataPreSaveCom
             con.addRequestProperty("Authorization", "Basic " + credential.substring(0, credential.length() - 1));
 
             System.out.println(con.getResponseCode() + con.getResponseMessage());
+
+            StringBuffer sbf = new StringBuffer();
+            sbf.append(con.getResponseCode() + con.getResponseMessage());
 
             PatientProgram patientProgram = new PatientProgram();
             Patient patient = new Patient();
@@ -156,13 +155,10 @@ public class PatientIdentifierSaveCommandImpl implements EncounterDataPreSaveCom
             }
 
             //url = new URL("https://dev-91.digitalhealthunit.org/openmrs/ws/rest/v1/bahmniprogramenrollment");
-            String payload = "{\n" +
-                    "\t\"patient\": \"6353499f-e039-4147-9b4d-5c20101a9107\",\n" +
-                    "\t\"program\": \"26a51046-b88b-11e9-b67c-080027e15975\",\n" +
-                    "\t\"dateEnrolled\": \"2020-07-30T00:00:00+0530\",\n" +
-                    "\t\"states\": [{\n" +
-                    "\t\t\"startDate\": \"2020-07-30T00:00:00+0530\"\n" +
-                    "\t}]\n" +
+            String payload = "{" +
+                    "\"patient\": \"6353499f-e039-4147-9b4d-5c20101a9107\"," +
+                    "\"program\": \"26a51046-b88b-11e9-b67c-080027e15975\"," +
+                    "\"dateEnrolled\": \"2020-07-30T00:00:00+0530\"" +
                     "}";
             StringEntity entity = new StringEntity(payload,
                     ContentType.APPLICATION_JSON);
@@ -170,15 +166,25 @@ public class PatientIdentifierSaveCommandImpl implements EncounterDataPreSaveCom
             HttpClient httpClient = HttpClientBuilder.create().build();
             HttpPost request = new HttpPost("https://dev-91.digitalhealthunit.org/openmrs/ws/rest/v1/bahmniprogramenrollment");
             request.setEntity(entity);
+            request.setHeader("Connection","keep-alive");
+            request.setHeader("Content-Type", "application/json;charset=UTF-8");
+            request.setHeader("Disable-WWW-Authenticate", "true");
+            request.setHeader("Host","dev-91.digitalhealthunit.org");
+            request.setHeader("Authorization",("Basic " + credential.substring(0, credential.length() - 1)));
+            sbf.append(entity.toString());
+            sbf.append(request);
 
             HttpResponse response = httpClient.execute(request);
             System.out.println("Calling Enrollment API" + response.getStatusLine().getStatusCode());
+            sbf.append("Calling Enrollment API" + response.getStatusLine().getStatusCode()+ response);
+            //Context.getService(BahmniProgramWorkflowService.class);
+            throw new Exception(sbf.toString());
         }
-        catch(Exception e)
-        {
-            e.printStackTrace();
-            throw e;
-        }
+//        catch(Exception e)
+//        {
+//            e.printStackTrace();
+//            throw e;
+//        }
 //       BahmniProgramWorkflowService service =  Context.getService(BahmniProgramWorkflowService.class);
 //       PatientProgram patProgram = service.savePatientProgram(patientProgram);
     }
