@@ -1,9 +1,13 @@
 package org.bahmni.module.bahmnipsi.identifier;
 
-import org.openmrs.Patient;
-import org.openmrs.PatientProgram;
-import org.openmrs.Person;
-import org.openmrs.Program;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.ContentType;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.HttpClientBuilder;
+import org.openmrs.*;
+import org.openmrs.api.context.Context;
 import org.openmrs.module.bahmniemrapi.encountertransaction.command.EncounterDataPreSaveCommand;
 import org.openmrs.module.bahmniemrapi.encountertransaction.contract.BahmniEncounterTransaction;
 import org.openmrs.module.bahmniemrapi.encountertransaction.contract.BahmniObservation;
@@ -114,32 +118,68 @@ public class PatientIdentifierSaveCommandImpl implements EncounterDataPreSaveCom
 
     private void autoEnrollIntoProgram(Collection<BahmniObservation> groupMembers) throws IOException, DatabaseUpdateException, InputRequiredException {
 
-        URL url = new URL("https://localhost/openmrs/ws/rest/v1/program");
-        HttpsURLConnectionImpl con = (HttpsURLConnectionImpl)url.openConnection();
-        con.setDefaultHostnameVerifier ((hostname, session) -> true);
-        con.setRequestMethod("GET");
-        con.setRequestProperty("Content-Type", "application/json");
-        String credential = Base64.getEncoder().encodeToString( ("superman"+":"+"Admin123").getBytes("UTF-8"));
-        con.addRequestProperty("Authorization", "Basic " + credential.substring(0, credential.length()-1));
+        try {
+            URL url = new URL("https://dev-91.digitalhealthunit.org/openmrs/ws/rest/v1/program");
+            HttpsURLConnectionImpl con = (HttpsURLConnectionImpl) url.openConnection();
+            con.setDefaultHostnameVerifier((hostname, session) -> true);
+            con.setRequestMethod("GET");
+            con.setRequestProperty("Content-Type", "application/json");
+            String credential = Base64.getEncoder().encodeToString(("superman" + ":" + "Admin123").getBytes("UTF-8"));
+            con.addRequestProperty("Authorization", "Basic " + credential.substring(0, credential.length() - 1));
 
-        PatientProgram patientProgram = new PatientProgram();
-        Patient patient = new Patient();
-        Person person = new Person();
-        person.setUuid("d44c703a-e526-4395-ba4f-af7ddf0d2155");
+            System.out.println(con.getResponseCode() + con.getResponseMessage());
 
-        patientProgram.setPatient(patient);
-        patientProgram.setDateEnrolled(new Date());
+            PatientProgram patientProgram = new PatientProgram();
+            Patient patient = new Patient();
+            Person person = new Person();
+            person.setUuid("6353499f-e039-4147-9b4d-5c20101a9107");
 
-        Program program = new Program();
-        program.setUuid("26a51046-b88b-11e9-b67c-080027e15975");
-        patientProgram.setProgram(program);
+            patientProgram.setPatient(patient);
+            patientProgram.setDateEnrolled(new Date());
 
-        for (BahmniObservation member : groupMembers) {
-            LinkedHashMap<String, String> value = (LinkedHashMap<String, String>) member.getValue();
-            if (value != null && value.get("name").equals(initialArt)) {
+            PatientState patientState = new PatientState();
+            patientState.setDateCreated(new Date());
+
+            Set<PatientState> sets = new TreeSet<PatientState>();
+            sets.add(patientState);
+
+            patientProgram.setStates(sets);
+
+            Program program = new Program();
+            program.setUuid("26a51046-b88b-11e9-b67c-080027e15975");
+            patientProgram.setProgram(program);
+
+            for (BahmniObservation member : groupMembers) {
+                LinkedHashMap<String, String> value = (LinkedHashMap<String, String>) member.getValue();
+                if (value != null && value.get("name").equals(initialArt)) {
+                }
             }
+
+            //url = new URL("https://dev-91.digitalhealthunit.org/openmrs/ws/rest/v1/bahmniprogramenrollment");
+            String payload = "{\n" +
+                    "\t\"patient\": \"6353499f-e039-4147-9b4d-5c20101a9107\",\n" +
+                    "\t\"program\": \"26a51046-b88b-11e9-b67c-080027e15975\",\n" +
+                    "\t\"dateEnrolled\": \"2020-07-30T00:00:00+0530\",\n" +
+                    "\t\"states\": [{\n" +
+                    "\t\t\"startDate\": \"2020-07-30T00:00:00+0530\"\n" +
+                    "\t}]\n" +
+                    "}";
+            StringEntity entity = new StringEntity(payload,
+                    ContentType.APPLICATION_JSON);
+
+            HttpClient httpClient = HttpClientBuilder.create().build();
+            HttpPost request = new HttpPost("https://dev-91.digitalhealthunit.org/openmrs/ws/rest/v1/bahmniprogramenrollment");
+            request.setEntity(entity);
+
+            HttpResponse response = httpClient.execute(request);
+            System.out.println("Calling Enrollment API" + response.getStatusLine().getStatusCode());
         }
-       // BahmniProgramWorkflowService service =  Context.getService(BahmniProgramWorkflowService.class);
-       // PatientProgram patProgram = service.savePatientProgram(patientProgram);
+        catch(Exception e)
+        {
+            e.printStackTrace();
+            throw e;
+        }
+//       BahmniProgramWorkflowService service =  Context.getService(BahmniProgramWorkflowService.class);
+//       PatientProgram patProgram = service.savePatientProgram(patientProgram);
     }
 }
