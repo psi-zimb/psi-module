@@ -1,9 +1,5 @@
 package org.bahmni.module.bahmnipsi.identifier;
 
-//import org.bahmni.module.bahmnicore.dao.BahmniProgramWorkflowDAO;
-//import org.bahmni.module.bahmnicore.dao.impl.BahmniHibernateProgramWorkflowDAOImpl;
-//import org.bahmni.module.bahmnicore.service.BahmniProgramWorkflowService;
-//import org.bahmni.module.bahmnicore.service.impl.BahmniProgramWorkflowServiceImpl;
 import org.bahmni.module.bahmnipsi.PatientTestData;
 import org.bahmni.module.bahmnipsi.enrollment.AutoEnrolIntoProgram;
 import org.junit.Before;
@@ -86,6 +82,7 @@ public class PatientIdentifierSaveCommandImplTest {
     @Test
     public void shouldCallUpdateOiPrepIdentifierWithAffixPWhenServiceIsPrepInitial() throws Exception {
         patientIdentifierSaveCommandImpl.setPatientOiPrepIdentifier(patientOiPrepIdentifier);
+        patientIdentifierSaveCommandImpl.setAutoEnrolIntoProgram(autoEnrolIntoProgram);
         doNothing().when(patientOiPrepIdentifier).updateOiPrepIdentifier(patientUuid, "P", "PrEP_INIT");
         BahmniEncounterTransaction bahmniEncounterTransaction = PatientTestData.setUpEncounterTransactionDataWith(prepInitial, conceptName, patientUuid);
         patientIdentifierSaveCommandImpl.update(bahmniEncounterTransaction);
@@ -158,7 +155,9 @@ public class PatientIdentifierSaveCommandImplTest {
     public void shouldNotCallUpdateOiPrepIdentifierIfRequiredServiceIsNotSelected() throws Exception {
         BahmniEncounterTransaction bahmniEncounterTransaction = PatientTestData.setUpEncounterTransactionDataWith("", conceptName, patientUuid);
 
+        patientIdentifierSaveCommandImpl.setAutoEnrolIntoProgram(autoEnrolIntoProgram);
         patientIdentifierSaveCommandImpl.update(bahmniEncounterTransaction);
+
 
         verify(patientOiPrepIdentifier, times(0)).updateOiPrepIdentifier(patientUuid, "A", "INIT_ART_SERVICE");
         verify(patientOiPrepIdentifier, times(0)).updateOiPrepIdentifier(patientUuid, "P", "INIT_ART_SERVICE");
@@ -168,94 +167,11 @@ public class PatientIdentifierSaveCommandImplTest {
     public void shouldNotDoAnythingIfReasonForVisitTypeIsNotSelected() throws Exception {
         BahmniEncounterTransaction bahmniEncounterTransaction = PatientTestData.setUpEncounterTransactionDataWith("", "", patientUuid);
 
+        patientIdentifierSaveCommandImpl.setAutoEnrolIntoProgram(autoEnrolIntoProgram);
         patientIdentifierSaveCommandImpl.update(bahmniEncounterTransaction);
 
         verify(patientOiPrepIdentifier, times(0)).updateOiPrepIdentifier(patientUuid, "A", "INIT_ART_SERVICE");
         verify(patientOiPrepIdentifier, times(0)).updateOiPrepIdentifier(patientUuid, "P", "INIT_ART_SERVICE");
 
-    }
-
-    @Test
-    public void shouldNotCallEnrollIfVisitTypeIsOtherThanInitialART() throws Exception {
-        String identifier = "00-OA-63-2017-P-01368";
-        PatientProgram patientProgram = new PatientProgram();
-        Patient patient = new Patient();
-        Person person = new Person();
-        person.setUuid("d44c703a-e526-4395-ba4f-af7ddf0d2155");
-
-        patientProgram.setPatient(patient);
-        patientProgram.setDateEnrolled(new Date());
-
-        Program program = new Program();
-        program.setUuid("26a51046-b88b-11e9-b67c-080027e15975");
-        patientProgram.setProgram(program);
-        patient = PatientTestData.setOiPrepIdentifierToPatient(identifier);
-
-        PowerMockito.when(patientService.getPatientByUuid(patientUuid)).thenReturn(patient);
-
-        String conceptName = "Reason for visit";
-        EncounterTransaction.Concept concept = new EncounterTransaction.Concept();
-        LinkedHashMap<String, String> object1 = new LinkedHashMap<>();
-        object1.put("name", "Initial ART service1");
-        BahmniObservation groupMember1 = new BahmniObservation();
-        BahmniObservation obs = new BahmniObservation();
-
-        concept.setName(conceptName);
-        groupMember1.setConcept(concept);
-        groupMember1.setValue(object1);
-        Collection<BahmniObservation> groupMembersCollection = Arrays.asList(groupMember1);
-        obs.setGroupMembers(groupMembersCollection);
-
-        BahmniEncounterTransaction bahmniEncounterTransaction = new BahmniEncounterTransaction();
-
-        bahmniEncounterTransaction.setPatientUuid(patientUuid);
-        bahmniEncounterTransaction.setObservations(Arrays.asList(obs));
-
-        patientIdentifierSaveCommandImpl.update(bahmniEncounterTransaction);
-
-        verify(autoEnrolIntoProgram, never()).autoEnrollIntoProgram(bahmniEncounterTransaction);
-    }
-
-    @Test
-    public void shouldCallEnrollIfVisitTypeIsInitialART() throws Exception {
-        String identifier = "00-OA-63-2017-P-01368";
-        PatientProgram patientProgram = new PatientProgram();
-        Patient patient = new Patient();
-        Person person = new Person();
-        person.setUuid("d44c703a-e526-4395-ba4f-af7ddf0d2155");
-
-        patientProgram.setPatient(patient);
-        patientProgram.setDateEnrolled(new Date());
-
-        Program program = new Program();
-        program.setUuid("26a51046-b88b-11e9-b67c-080027e15975");
-        patientProgram.setProgram(program);
-        patient = PatientTestData.setOiPrepIdentifierToPatient(identifier);
-
-        PowerMockito.when(patientService.getPatientByUuid(patientUuid)).thenReturn(patient);
-
-        String conceptName = "Reason for visit";
-        EncounterTransaction.Concept concept = new EncounterTransaction.Concept();
-        LinkedHashMap<String, String> object1 = new LinkedHashMap<>();
-        object1.put("name", "Initial ART service");
-        BahmniObservation groupMember1 = new BahmniObservation();
-        BahmniObservation obs = new BahmniObservation();
-
-        concept.setName(conceptName);
-        groupMember1.setConcept(concept);
-        groupMember1.setValue(object1);
-        Collection<BahmniObservation> groupMembersCollection = Arrays.asList(groupMember1);
-        obs.setGroupMembers(groupMembersCollection);
-
-        BahmniEncounterTransaction bahmniEncounterTransaction = new BahmniEncounterTransaction();
-
-        bahmniEncounterTransaction.setPatientUuid(patientUuid);
-        bahmniEncounterTransaction.setPatientId("1234");
-        bahmniEncounterTransaction.setObservations(Arrays.asList(obs));
-        patientIdentifierSaveCommandImpl.setPatientOiPrepIdentifier(patientOiPrepIdentifier);
-        patientIdentifierSaveCommandImpl.setAutoEnrolIntoProgram(autoEnrolIntoProgram);
-        patientIdentifierSaveCommandImpl.update(bahmniEncounterTransaction);
-
-        verify(autoEnrolIntoProgram, times(1)).autoEnrollIntoProgram(bahmniEncounterTransaction);
     }
 }

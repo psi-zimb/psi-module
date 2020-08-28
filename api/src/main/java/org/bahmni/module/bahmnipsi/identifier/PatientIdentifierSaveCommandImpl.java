@@ -25,7 +25,7 @@ public class PatientIdentifierSaveCommandImpl implements EncounterDataPreSaveCom
     private final String INIT_ART_SEQ_TYPE = "INIT_ART_SERVICE";
     private final String PREP_INIT_SEQ_TYPE = "PrEP_INIT";
     private PatientOiPrepIdentifier patientOiPrepIdentifier;
-    private AutoEnrolIntoProgram autoEnrolIntoProgram;
+    public AutoEnrolIntoProgram autoEnrolIntoProgram;
     private Log log = LogFactory.getLog(this.getClass());
 
 //    @Autowired
@@ -45,10 +45,11 @@ public class PatientIdentifierSaveCommandImpl implements EncounterDataPreSaveCom
 
         String requiredObs = checkForArtPrepServiceObs(groupMembers);
 
+        autoEnrolIntoProgram.autoEnrollIntoProgram(bahmniEncounterTransaction,groupMembers);
+
         if (!requiredObs.isEmpty()) {
             if (requiredObs.equalsIgnoreCase(initialArt)) {
                 try {
-                    autoEnrolIntoProgram.autoEnrollIntoProgram(bahmniEncounterTransaction);
                     patientOiPrepIdentifier.updateOiPrepIdentifier(patientUuid, "A", INIT_ART_SEQ_TYPE);
                 } catch (Exception e) {
                     e.printStackTrace();
