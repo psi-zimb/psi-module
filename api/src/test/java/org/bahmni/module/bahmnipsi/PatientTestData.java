@@ -88,4 +88,18 @@ public class PatientTestData {
         obs.setGroupMembers(groupMembersCollection);
         return Arrays.asList(obs);
     }
+
+    public static Program setPatientProgramsData()
+    {
+        Program program = new Program();
+        program.setUuid("26a51046-b88b-11e9-b67c-080027e15975");
+        program.setId(6);
+        Concept c= new Concept();
+        ConceptName c1= new ConceptName();
+        c1.setName("ART Program");
+        Collection<ConceptName> conceptNames =Arrays.asList(c1);
+        c.setNames(conceptNames);
+        program.setConcept(c);
+        return program;
+    }
 }

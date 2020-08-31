@@ -51,7 +51,6 @@ public class AutoEnrolIntoProgramTest {
     private Patient patient = PatientTestData.setOiPrepIdentifierToPatient("00-OA-63-2017-P-01368");;
     private String patientUuid = "23ffg-54lkk-lk";
     private String initialArtService = "Initial ART service";
-    private String prepInitial = "PrEP Initial";
     private String conceptName = "Reason for visit";
 
     @Before
@@ -66,15 +65,8 @@ public class AutoEnrolIntoProgramTest {
 
     @Test
     public void shouldNotEnrollIfVisitTypeIsNotValid() throws Exception {
-        Program program = new Program();
-        program.setUuid("26a51046-b88b-11e9-b67c-080027e15975");
-        program.setId(6);
-        Concept c= new Concept();
-        ConceptName c1= new ConceptName();
-        c1.setName("ART Program");
-        Collection<ConceptName> conceptNames =Arrays.asList(c1);
-        c.setNames(conceptNames);
-        program.setConcept(c);
+        /************ Initialization *************/
+        Program program = PatientTestData.setPatientProgramsData();
 
         PatientProgram patientProgram = new PatientProgram();
         patientProgram.setPatient(patient);
@@ -88,61 +80,31 @@ public class AutoEnrolIntoProgramTest {
         List<PatientProgram> patientProgramList = new ArrayList<>();
         patientProgramList.add(patientProgram);
 
-        PowerMockito.when(bahmniProgramWorkflowService.getPatientPrograms(patient,null,null,null,null,
-                null,false)).thenReturn(patientProgramList);
-        PowerMockito.when(bahmniProgramWorkflowService.getAllPrograms()).thenReturn(programs);
-
-        String conceptName = "Reason for visit";
-
-        EncounterTransaction.Concept concept = new EncounterTransaction.Concept();
-        concept.setName(conceptName);
-
-        LinkedHashMap<String, String> object1 = new LinkedHashMap<>();
-        object1.put("name", "Initial ART service12");
-
-        BahmniObservation groupMember1 = new BahmniObservation();
-        groupMember1.setConcept(concept);
-        groupMember1.setValue(object1);
-        Collection<BahmniObservation> groupMembersCollection = Arrays.asList(groupMember1);
-
-        BahmniObservation obs = new BahmniObservation();
-        obs.setGroupMembers(groupMembersCollection);
-
-        BahmniEncounterTransaction bahmniEncounterTransaction = new BahmniEncounterTransaction();
-
-        bahmniEncounterTransaction.setPatientUuid(patientUuid);
+        BahmniEncounterTransaction bahmniEncounterTransaction = PatientTestData.setUpEncounterTransactionDataWith("Initial ART service2", conceptName, patientUuid);
         bahmniEncounterTransaction.setPatientId("1234");
-        bahmniEncounterTransaction.setObservations(Arrays.asList(obs));
+        TreeSet<BahmniObservation> bos = (TreeSet)bahmniEncounterTransaction.getObservations();
 
-        autoEnrolIntoProgram.autoEnrollIntoProgram(bahmniEncounterTransaction,groupMembersCollection);
+        autoEnrolIntoProgram.setAutoEnrollUtility(autoEnrollUtility);
+        PowerMockito.when(autoEnrollUtility.getPatientProgramsList(patient)).thenReturn(patientProgramList);
+        PowerMockito.when(autoEnrollUtility.getProgramsList()).thenReturn(programs);
+        PowerMockito.when(autoEnrollUtility.getPatient(bahmniEncounterTransaction)).thenReturn(patient);
+
+        /************** Action ************/
+        autoEnrolIntoProgram.autoEnrollIntoProgram(bahmniEncounterTransaction,bos.pollFirst().getGroupMembers());
+
+        /************* Verification *********/
         verify(autoEnrollUtility,times(0)).enrollProgram(anyObject());
     }
 
     @Test
     public void shouldEnrollIfVisitTypeIsValid() throws Exception {
-        String identifier = "00-OA-63-2017-P-01368";
-        PatientProgram patientProgram = new PatientProgram();
-        Patient patient = new Patient();
-        Person person = new Person();
-        person.setUuid("d44c703a-e526-4395-ba4f-af7ddf0d2155");
+        /************ Initialization *************/
+        Program program = PatientTestData.setPatientProgramsData();
 
+        PatientProgram patientProgram = new PatientProgram();
         patientProgram.setPatient(patient);
         patientProgram.setDateEnrolled(new Date());
-
-        Program program = new Program();
-        program.setUuid("26a51046-b88b-11e9-b67c-080027e15975");
-        program.setId(6);
-        Concept c = new Concept();
-        c.setId(1234);
-        ConceptName c1 = new ConceptName();
-        c1.setId(1123);
-        c1.setName("ART Program");
-        Collection<ConceptName> conceptNames = Arrays.asList(c1);
-        c.setNames(conceptNames);
-        program.setConcept(c);
         patientProgram.setProgram(program);
-
-        patient = PatientTestData.setOiPrepIdentifierToPatient(identifier);
 
         List<Program> programs = new ArrayList<>();
         program.setName("ART Program");
@@ -151,46 +113,71 @@ public class AutoEnrolIntoProgramTest {
         List<PatientProgram> patientProgramList = new ArrayList<>();
         patientProgramList.add(patientProgram);
 
+        BahmniEncounterTransaction bahmniEncounterTransaction = PatientTestData.setUpEncounterTransactionDataWith(initialArtService, conceptName, patientUuid);
+        bahmniEncounterTransaction.setPatientId("1234");
+        TreeSet<BahmniObservation> bos = (TreeSet)bahmniEncounterTransaction.getObservations();
+
+
         autoEnrolIntoProgram.setAutoEnrollUtility(autoEnrollUtility);
-        PowerMockito.when(patientService.getPatientByUuid(patientUuid)).thenReturn(patient);
-        PowerMockito.when(bahmniProgramWorkflowService.getPatientPrograms(patient, null, null, null, null,
-                null, false)).thenReturn(patientProgramList);
-        PowerMockito.when(bahmniProgramWorkflowService.getAllPrograms()).thenReturn(programs);
+        PowerMockito.when(autoEnrollUtility.getPatientProgramsList(patient)).thenReturn(patientProgramList);
+        PowerMockito.when(autoEnrollUtility.getProgramsList()).thenReturn(programs);
+        PowerMockito.when(autoEnrollUtility.getPatient(bahmniEncounterTransaction)).thenReturn(patient);
+        PowerMockito.when(autoEnrollUtility.checkProgramAlreadyEnrolled("ART Program",patientProgramList)).thenReturn(false);
+        PowerMockito.when(autoEnrollUtility.preparePatientProgramEntity(bahmniEncounterTransaction,"ART Program",programs)).thenReturn(patientProgram);
+
+        /************** Action ************/
+        autoEnrolIntoProgram.autoEnrollIntoProgram(bahmniEncounterTransaction, bos.pollFirst().getGroupMembers());
+
+        /************* Verification *********/
+        verify(autoEnrollUtility,times(1)).enrollProgram(anyObject());
+    }
+
+    @Test
+    public void shouldNotEnrollIfVisitTypeIsValidAndProgramNameMappingNotMatchedWithSystemDefinedPrograms() throws Exception {
+        /************ Initialization *************/
+        Program program = PatientTestData.setPatientProgramsData();
+
+        PatientProgram patientProgram = new PatientProgram();
+        patientProgram.setPatient(patient);
+        patientProgram.setDateEnrolled(new Date());
+        patientProgram.setProgram(program);
+
+        List<Program> programs = new ArrayList<>();
+        program.setName("ART Program");
+        programs.add(program);
+
+        List<PatientProgram> patientProgramList = new ArrayList<>();
+        patientProgramList.add(patientProgram);
 
         BahmniEncounterTransaction bahmniEncounterTransaction = PatientTestData.setUpEncounterTransactionDataWith(initialArtService, conceptName, patientUuid);
         bahmniEncounterTransaction.setPatientId("1234");
         TreeSet<BahmniObservation> bos = (TreeSet)bahmniEncounterTransaction.getObservations();
 
+        autoEnrolIntoProgram.setAutoEnrollUtility(autoEnrollUtility);
+        PowerMockito.when(autoEnrollUtility.getPatientProgramsList(patient)).thenReturn(patientProgramList);
+        PowerMockito.when(autoEnrollUtility.getProgramsList()).thenReturn(programs);
+        PowerMockito.when(autoEnrollUtility.getPatient(bahmniEncounterTransaction)).thenReturn(patient);
         PowerMockito.when(autoEnrollUtility.checkProgramAlreadyEnrolled("ART Program",patientProgramList)).thenReturn(false);
-        PowerMockito.when(autoEnrollUtility.preparePatientProgramEntity(bahmniEncounterTransaction,"",programs)).thenReturn(patientProgram);
+        PowerMockito.when(autoEnrollUtility.preparePatientProgramEntity(bahmniEncounterTransaction,"ART Program",programs)).thenReturn(null);
 
+        /************** Action ************/
         autoEnrolIntoProgram.autoEnrollIntoProgram(bahmniEncounterTransaction, bos.pollFirst().getGroupMembers());
 
-        verify(autoEnrollUtility,times(1)).enrollProgram(anyObject());
+        /************* Verification *********/
+        verify(autoEnrollUtility,times(0)).enrollProgram(anyObject());
     }
 
     @Test
     public void shouldEnrollInMultipleProgramsIfMultipleVisitTypesWereSelected() throws Exception {
+        /************ Initialization *************/
+        Program program = PatientTestData.setPatientProgramsData();
         String identifier = "00-OA-63-2017-P-01368";
         PatientProgram patientProgram = new PatientProgram();
         Patient patient = new Patient();
         Person person = new Person();
         person.setUuid("d44c703a-e526-4395-ba4f-af7ddf0d2155");
-
         patientProgram.setPatient(patient);
         patientProgram.setDateEnrolled(new Date());
-
-        Program program = new Program();
-        program.setUuid("26a51046-b88b-11e9-b67c-080027e15975");
-        program.setId(6);
-        Concept c= new Concept();
-        c.setId(1234);
-        ConceptName c1= new ConceptName();
-        c1.setId(1123);
-        c1.setName("ART Program");
-        Collection<ConceptName> conceptNames =Arrays.asList(c1);
-        c.setNames(conceptNames);
-        program.setConcept(c);
         patientProgram.setProgram(program);
 
         patient = PatientTestData.setOiPrepIdentifierToPatient(identifier);
@@ -231,12 +218,16 @@ public class AutoEnrolIntoProgramTest {
         PowerMockito.when(autoEnrollUtility.getPatientProgramsList(patient)).thenReturn(patientProgramList);
         PowerMockito.when(autoEnrollUtility.getProgramsList()).thenReturn(programs);
         PowerMockito.when(autoEnrollUtility.getPatient(bahmniEncounterTransaction)).thenReturn(patient);
-        PowerMockito.when(autoEnrollUtility.checkProgramAlreadyEnrolled("",patientProgramList)).thenReturn(false);
-        PowerMockito.when(autoEnrollUtility.preparePatientProgramEntity(bahmniEncounterTransaction,"",programs)).thenReturn(patientProgram);
-
+        PowerMockito.when(autoEnrollUtility.checkProgramAlreadyEnrolled("ART Program",patientProgramList)).thenReturn(false);
+        PowerMockito.when(autoEnrollUtility.checkProgramAlreadyEnrolled("VIAC Program",patientProgramList)).thenReturn(false);
+        PowerMockito.when(autoEnrollUtility.preparePatientProgramEntity(bahmniEncounterTransaction,"ART Program",programs)).thenReturn(patientProgram);
+        PowerMockito.when(autoEnrollUtility.preparePatientProgramEntity(bahmniEncounterTransaction,"VIAC Program",programs)).thenReturn(patientProgram);
         autoEnrolIntoProgram.setAutoEnrollUtility(autoEnrollUtility);
+
+        /************** Action ************/
         autoEnrolIntoProgram.autoEnrollIntoProgram(bahmniEncounterTransaction,obs.getGroupMembers());
 
+        /************* Verification *********/
         verify(autoEnrollUtility,times(2)).enrollProgram(anyObject());
 
     }
@@ -244,30 +235,20 @@ public class AutoEnrolIntoProgramTest {
     @Test
     public void shouldNotEnrollIfPatientIsAlreadyEnrolledIntoProgram()
     {
+        /************ Initialization *************/
         BahmniEncounterTransaction bahmniEncounterTransaction = PatientTestData.setUpEncounterTransactionDataWith(initialArtService, conceptName, patientUuid);
         bahmniEncounterTransaction.setPatientId("1234");
         TreeSet<BahmniObservation> bos = (TreeSet)bahmniEncounterTransaction.getObservations();
 
+        Program program = PatientTestData.setPatientProgramsData();
         String identifier = "00-OA-63-2017-P-01368";
+
         PatientProgram patientProgram = new PatientProgram();
         Patient patient = new Patient();
         Person person = new Person();
         person.setUuid("d44c703a-e526-4395-ba4f-af7ddf0d2155");
-
         patientProgram.setPatient(patient);
         patientProgram.setDateEnrolled(new Date());
-
-        Program program = new Program();
-        program.setUuid("26a51046-b88b-11e9-b67c-080027e15975");
-        program.setId(6);
-        Concept c = new Concept();
-        c.setId(1234);
-        ConceptName c1 = new ConceptName();
-        c1.setId(1123);
-        c1.setName("ART Program");
-        Collection<ConceptName> conceptNames = Arrays.asList(c1);
-        c.setNames(conceptNames);
-        program.setConcept(c);
         patientProgram.setProgram(program);
 
         patient = PatientTestData.setOiPrepIdentifierToPatient(identifier);
@@ -283,18 +264,20 @@ public class AutoEnrolIntoProgramTest {
         PowerMockito.when(autoEnrollUtility.getProgramsList()).thenReturn(programs);
         PowerMockito.when(autoEnrollUtility.getPatient(bahmniEncounterTransaction)).thenReturn(patient);
         PowerMockito.when(autoEnrollUtility.checkProgramAlreadyEnrolled("ART Program",patientProgramList)).thenReturn(true);
-        PowerMockito.when(autoEnrollUtility.preparePatientProgramEntity(bahmniEncounterTransaction,"",programs)).thenReturn(patientProgram);
-
+        PowerMockito.when(autoEnrollUtility.preparePatientProgramEntity(bahmniEncounterTransaction,"ART Program",programs)).thenReturn(patientProgram);
         autoEnrolIntoProgram.setAutoEnrollUtility(autoEnrollUtility);
 
+        /************** Action ************/
         autoEnrolIntoProgram.autoEnrollIntoProgram(bahmniEncounterTransaction,bos.pollFirst().getGroupMembers());
 
+        /************* Verification *********/
         verify(autoEnrollUtility,times(0)).enrollProgram(anyObject());
     }
 
     @Test
     public void shouldEnrollIntoUnEnrolledProgramsWhenMultipleVisitTypesWereSelected()
     {
+        /************ Initialization *************/
         String identifier = "00-OA-63-2017-P-01368";
         PatientProgram patientProgram = new PatientProgram();
         Patient patient = new Patient();
@@ -304,17 +287,7 @@ public class AutoEnrolIntoProgramTest {
         patientProgram.setPatient(patient);
         patientProgram.setDateEnrolled(new Date());
 
-        Program program = new Program();
-        program.setUuid("26a51046-b88b-11e9-b67c-080027e15975");
-        program.setId(6);
-        Concept c= new Concept();
-        c.setId(1234);
-        ConceptName c1= new ConceptName();
-        c1.setId(1123);
-        c1.setName("ART Program");
-        Collection<ConceptName> conceptNames =Arrays.asList(c1);
-        c.setNames(conceptNames);
-        program.setConcept(c);
+        Program program = PatientTestData.setPatientProgramsData();
         patientProgram.setProgram(program);
 
         patient = PatientTestData.setOiPrepIdentifierToPatient(identifier);
@@ -357,11 +330,13 @@ public class AutoEnrolIntoProgramTest {
         PowerMockito.when(autoEnrollUtility.getPatient(bahmniEncounterTransaction)).thenReturn(patient);
         PowerMockito.when(autoEnrollUtility.checkProgramAlreadyEnrolled("ART Program",patientProgramList)).thenReturn(false);
         PowerMockito.when(autoEnrollUtility.checkProgramAlreadyEnrolled("VIAC Program",patientProgramList)).thenReturn(true);
-        PowerMockito.when(autoEnrollUtility.preparePatientProgramEntity(bahmniEncounterTransaction,"",programs)).thenReturn(patientProgram);
-
+        PowerMockito.when(autoEnrollUtility.preparePatientProgramEntity(bahmniEncounterTransaction,"ART Program",programs)).thenReturn(patientProgram);
         autoEnrolIntoProgram.setAutoEnrollUtility(autoEnrollUtility);
+
+        /************** Action ************/
         autoEnrolIntoProgram.autoEnrollIntoProgram(bahmniEncounterTransaction,obs.getGroupMembers());
 
+        /************* Verification *********/
         verify(autoEnrollUtility,times(1)).enrollProgram(anyObject());
     }
 

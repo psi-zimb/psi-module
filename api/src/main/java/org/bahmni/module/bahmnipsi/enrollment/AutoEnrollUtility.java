@@ -29,8 +29,8 @@ public class AutoEnrollUtility {
                 null,false);
     }
 
-    public  void enrollProgram(PatientProgram patientProgram){
-        Context.getProgramWorkflowService().savePatientProgram(patientProgram);
+    public PatientProgram enrollProgram(PatientProgram patientProgram){
+        return Context.getProgramWorkflowService().savePatientProgram(patientProgram);
     }
 
     public  List<Program> getProgramsList(){
@@ -38,13 +38,14 @@ public class AutoEnrollUtility {
     }
 
     public PatientProgram preparePatientProgramEntity(BahmniEncounterTransaction bahmniEncounterTransaction,String programName,List<Program> programs){
-        PatientProgram patientProgram = new PatientProgram();
-        Patient patient = getPatient(bahmniEncounterTransaction);
-        patientProgram.setPatient(patient);
-        patientProgram.setDateEnrolled(new Date());
+        PatientProgram patientProgram = null;
         for(Program program : programs){
             if(program.getConcept().getName().toString().equals(programName))
             {
+                patientProgram = new PatientProgram();
+                Patient patient = getPatient(bahmniEncounterTransaction);
+                patientProgram.setPatient(patient);
+                patientProgram.setDateEnrolled(new Date());
                 Program tempProgramEntity = new Program();
                 tempProgramEntity.setProgramId(program.getProgramId());
                 tempProgramEntity.setUuid(program.getUuid());

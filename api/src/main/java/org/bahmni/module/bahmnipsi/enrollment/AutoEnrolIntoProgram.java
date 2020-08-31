@@ -37,7 +37,8 @@ public class AutoEnrolIntoProgram {
         for(String programName: programsToEnroll)
             {
             PatientProgram patientProgram = autoEnrollUtility.preparePatientProgramEntity(bahmniEncounterTransaction,programName,programs);
-            autoEnrollUtility.enrollProgram(patientProgram);
+            if(patientProgram!=null)
+                autoEnrollUtility.enrollProgram(patientProgram);
             }
         }
         catch(Exception e)
