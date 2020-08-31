@@ -1,5 +1,7 @@
 package org.bahmni.module.bahmnipsi.enrollment;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.openmrs.Patient;
 import org.openmrs.PatientProgram;
 import org.openmrs.Program;
@@ -11,6 +13,7 @@ import java.util.*;
 
 @Component
 public class AutoEnrollUtility {
+    private Log logger = LogFactory.getLog(this.getClass());
 
     public  boolean checkProgramAlreadyEnrolled(String programName, List<PatientProgram> patientProgramsUsingPatientUUID){
         for(PatientProgram program : patientProgramsUsingPatientUUID){
@@ -25,12 +28,13 @@ public class AutoEnrollUtility {
     }
 
     public  List<PatientProgram> getPatientProgramsList(Patient patient){
-        return  Context.getProgramWorkflowService().getPatientPrograms(patient,null,null,null,null,
+        List<PatientProgram> list = Context.getProgramWorkflowService().getPatientPrograms(patient,null,null,null,null,
                 null,false);
+        return filterPatientPrograms(list);
     }
 
-    public PatientProgram enrollProgram(PatientProgram patientProgram){
-        return Context.getProgramWorkflowService().savePatientProgram(patientProgram);
+    public void enrollProgram(PatientProgram patientProgram){
+         Context.getProgramWorkflowService().savePatientProgram(patientProgram);
     }
 
     public  List<Program> getProgramsList(){
@@ -50,9 +54,24 @@ public class AutoEnrollUtility {
                 tempProgramEntity.setProgramId(program.getProgramId());
                 tempProgramEntity.setUuid(program.getUuid());
                 patientProgram.setProgram(tempProgramEntity);
+                logger.error("patient program prepared successfully ->");
                 break;
             }
         }
         return patientProgram;
+    }
+
+    private List<PatientProgram> filterPatientPrograms(List<PatientProgram> programsList)
+    {
+        List<PatientProgram> tempList = new ArrayList<>();
+        logger.error("patient Programs list size -> "+programsList.size());
+        for(PatientProgram patientProgram : programsList)
+        {
+            if(patientProgram.getDateCompleted() != null){
+                logger.error("program added successfully ->"+patientProgram.toString());
+                tempList.add(patientProgram);
+            }
+        }
+        return tempList;
     }
 }
