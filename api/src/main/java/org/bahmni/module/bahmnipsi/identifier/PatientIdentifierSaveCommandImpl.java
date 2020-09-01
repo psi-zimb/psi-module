@@ -28,11 +28,6 @@ public class PatientIdentifierSaveCommandImpl implements EncounterDataPreSaveCom
     private AutoEnrolIntoProgram autoEnrolIntoProgram;
     private Log log = LogFactory.getLog(this.getClass());
 
-//    @Autowired
-//    public PatientIdentifierSaveCommandImpl(PatientOiPrepIdentifier patientOiPrepIdentifier) {
-//        this.patientOiPrepIdentifier = patientOiPrepIdentifier;
-//    }
-
     @Autowired
     public PatientIdentifierSaveCommandImpl(PatientOiPrepIdentifier patientOiPrepIdentifier,AutoEnrolIntoProgram autoEnrolIntoProgram) {
         this.patientOiPrepIdentifier = patientOiPrepIdentifier;

@@ -33,7 +33,6 @@ public class AutoEnrolIntoProgram {
         List<PatientProgram> patientProgramList = autoEnrollUtility.getPatientProgramsList(patient);
         List<Program> programs = autoEnrollUtility.getProgramsList();
         Set<String> programsToEnroll = prepareProgramsToAutoEnroll(groupMembers, patientProgramList);
-
         for(String programName: programsToEnroll)
             {
             PatientProgram patientProgram = autoEnrollUtility.preparePatientProgramEntity(bahmniEncounterTransaction,programName,programs);
@@ -43,7 +42,7 @@ public class AutoEnrolIntoProgram {
         }
         catch(Exception e)
         {
-            logger.error(e.getStackTrace());
+            logger.error(e.getMessage());
             new RuntimeException(errorMessage);
         }
     }
