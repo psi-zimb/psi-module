@@ -7,6 +7,8 @@ import org.openmrs.api.context.Context;
 import org.openmrs.module.bahmniemrapi.encountertransaction.contract.BahmniEncounterTransaction;
 import org.springframework.stereotype.Component;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -41,7 +43,7 @@ public class AutoEnrollUtility {
         return Context.getProgramWorkflowService().getAllPrograms();
     }
 
-    public PatientProgram preparePatientProgramEntity(BahmniEncounterTransaction bahmniEncounterTransaction,String programName,List<Program> programs){
+    public PatientProgram preparePatientProgramEntity(BahmniEncounterTransaction bahmniEncounterTransaction,String programName,List<Program> programs) {
         PatientProgram patientProgram = null;
         for(Program program : programs){
             if(program.getConcept().getName().toString().equals(programName))
@@ -49,7 +51,7 @@ public class AutoEnrollUtility {
                 patientProgram = new PatientProgram();
                 Patient patient = getPatient(bahmniEncounterTransaction);
                 patientProgram.setPatient(patient);
-                patientProgram.setDateEnrolled(new Date());
+                patientProgram.setDateEnrolled(getTodayDateWithoutTime());
                 Program tempProgramEntity = new Program();
                 tempProgramEntity.setProgramId(program.getProgramId());
                 tempProgramEntity.setUuid(program.getUuid());
@@ -70,5 +72,17 @@ public class AutoEnrollUtility {
             }
         }
         return tempList;
+    }
+
+    private Date getTodayDateWithoutTime()  {
+        Date date = new Date();
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+        String format = formatter.format(date);
+        try {
+            return new SimpleDateFormat("yyyy-MM-dd").parse(format);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return date;
     }
 }
